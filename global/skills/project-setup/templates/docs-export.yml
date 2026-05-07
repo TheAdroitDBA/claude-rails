@@ -1,0 +1,10 @@
+# docs.export.yml -- declares what this repo publishes to http://docs
+# Full spec: docs-export.feature.md in the claude-config clone.
+project: [Project Name]
+repo_url: [origin URL]
+branch: main
+
+nav:
+  - Overview: README.md
+  # Add feature docs, flow docs, and guides as they are created.
+  # Paths are relative to repo root.

@@ -1,0 +1,22 @@
+---
+description: Record a bug without investigating it. Use when a bug is found during feature work that is not blocking and not a small same-file fix. Captures context at peak freshness; the fix happens later via /t.
+argument-hint: <bug-description>
+---
+
+Record bug: $ARGUMENTS
+
+Do NOT investigate, fix, or expand scope. Capture context only -- these steps preserve the bug at peak freshness so a dedicated session can fix it efficiently.
+
+1. Read the project's issues tracker (discovered from CLAUDE.md; fallback memory/KNOWN-ISSUES.md). Deduplicate: if this bug is already recorded, add any new context to the existing entry and stop.
+
+2. Identify which feature doc(s) this bug violates. A bug always violates at least one success criterion.
+
+3. Check that a feature doc exists for each affected feature. Create a stub if none exists (criteria can be minimal at this stage).
+
+4. Add a [BUG] tagged criterion to the relevant feature doc(s). The criterion should be testable: describe what "fixed" looks like, not just what is broken.
+
+5. Check whether a flow doc covers the affected pipeline. If none exists, flag the gap -- /t will create the flow doc before fixing.
+
+6. Write a 2-3 line entry in the issues tracker: what breaks, which feature criterion it violates, and what file/function to look at first.
+
+7. Report: use /t to investigate and fix in a dedicated session.

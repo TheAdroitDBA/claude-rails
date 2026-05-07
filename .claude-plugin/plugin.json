@@ -1,0 +1,9 @@
+{
+  "name": "claude-rails",
+  "description": "Portable framework that eliminates token waste, repetitive tasks, and inconsistent project shape across every repo. Provides workflow slash commands, enforcement hooks, and global-pool skills.",
+  "version": "1.0.0",
+  "author": "TheAdroitDBA",
+  "repository": "https://github.com/TheAdroitDBA/claude-rails",
+  "skills": "global/skills",
+  "agents": "global/agents"
+}
