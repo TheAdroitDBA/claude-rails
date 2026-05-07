@@ -1,7 +1,7 @@
 # [Project Name] Memory
 
 ## Framework
-Follows claude-config. Framework charter lives in the claude-config clone on this machine (see the sync script's install path); global skills, hooks, agents, and rules are reachable under `~/.claude/`.
+Follows claude-rails. Framework charter lives in the claude-rails clone on this machine (see the sync script's install path); global skills, hooks, agents, and rules are reachable under `~/.claude/`.
 
 ## Reference files (on-demand)
 - (added as topic files accumulate)

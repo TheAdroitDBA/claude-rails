@@ -136,35 +136,11 @@ For a project that already has code, docs, or a previous Claude Code setup:
 4. After approval, `/project-setup` executes migrations, rewrites references in docs (never in source code), and re-runs the audit to confirm everything is PASS.
 5. If you have existing feature docs without `## Status` or numbered criteria, add those sections incrementally. The framework enforces going forward, not retroactively.
 
-### Optional: Hard enforcement via shell hooks
+### Enforcement hooks
 
-`/project-setup` enforces rules through Claude's own instructions (stored in CLAUDE.md). If you also want OS-level blocking that fires unconditionally, add to `~/.claude/settings.local.json`:
+Enforcement hooks ship with the plugin and auto-wire when it loads -- no manual `settings.local.json` editing needed. They use prompt-type handlers (Claude evaluates the enforcement logic directly), so they work identically on Mac, Windows, and Linux.
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [{"type": "command", "command": "bash /path/to/claude-rails/global/hooks/require-feature-doc.sh"}]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [{"type": "command", "command": "bash /path/to/claude-rails/global/hooks/auto-lint.sh"}]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [{"type": "command", "command": "bash /path/to/claude-rails/global/hooks/stale-feature-check.sh"}]
-      }
-    ]
-  }
-}
-```
-
-Replace `/path/to/claude-rails` with your actual clone path. Windows: replace `bash .../...sh` with `powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\claude-rails\...\...ps1`.
+The hooks are globally active but only enforce in repos that have opted in. When `/project-setup` creates the `.claude/feature-doc-required` marker, that repo comes under enforcement. Repos without the marker are unaffected.
 
 ## What Ships
 
@@ -235,7 +211,7 @@ claude-rails/
   global/                    Global pool: discovered by the plugin
     skills/                  Framework + domain-expert skills
     agents/                  Global agents
-    hooks/                   Hook scripts + hook-lifecycle.flow.md
+    hooks/                   hook-lifecycle.flow.md (hook definitions in .claude-plugin/hooks/hooks.json)
   link-commands.sh           One-time symlink setup (Mac/Linux)
   link-commands.ps1          One-time junction setup (Windows)
 ```

@@ -41,7 +41,7 @@ Discover the broken-items tracker from the adopted repo's own declaration. Check
 
 1. Read `CLAUDE.md` for a declared tracker location. Look for phrases like "known issues", "risk register", "bug tracker", "active issues", or a line naming a specific file.
 2. If CLAUDE.md declares a tracker (e.g. `docs/operations/risk-register.md` or a section in `memory/<project>.md`), read that file as the authoritative source.
-3. If CLAUDE.md does not declare a tracker, fall back to `memory/KNOWN-ISSUES.md` (the claude-config framework default).
+3. If CLAUDE.md does not declare a tracker, fall back to `memory/KNOWN-ISSUES.md` (the claude-rails framework default).
 4. Additionally, scan feature docs for `[BUG]` criteria or `DONE-WITH-BUGS` statuses regardless of where the main tracker lives.
 
 If no tracker is declared AND no `memory/KNOWN-ISSUES.md` exists AND no `[BUG]` markers are found, report: "No broken-items tracker discovered; absence is a finding." Do NOT default to "nothing is broken" — the absence of a tracker is itself the signal.
@@ -68,7 +68,7 @@ End your output with this exact line, verbatim:
 ## Do not
 
 - Do not write any file, propose fixes, or recommend framework adoption. This is read-only verification.
-- Do not assume the repo has adopted the claude-config framework. If it has no `memory/`, no feature docs, or no `CLAUDE.md`, note the absence as a finding — do not unilaterally suggest adoption.
+- Do not assume the repo has adopted the claude-rails framework. If it has no `memory/`, no feature docs, or no `CLAUDE.md`, note the absence as a finding — do not unilaterally suggest adoption.
 - Do not reorder, merge, or skip the four questions.
 - Do not print the words "PASS" or "FAIL" yourself. The user marks the result.
 - **Do not read files outside the CWD scope defined in Step 1, even when an in-scope file references them.** If `CLAUDE.md` or a feature doc inside your scope points at a file outside the CWD (e.g. a sibling directory under the git root), record that reference as a finding — "CLAUDE.md references `../terraform/main.tf` but that file is outside audit scope" — and move on. Out-of-scope files are never opened.

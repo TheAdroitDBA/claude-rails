@@ -27,7 +27,7 @@ Stop when you have enough context:
 - **Outside-in design:** for features with a user-facing surface, write the flow doc first, then feature doc + criteria. Feature criteria must map to flow steps; they own the no-breaking-changes contract.
 - **Progress checklist:** every in-progress feature doc has a `### Progress` checklist under `## Status`. Update it at every decision point BEFORE the code. Last entry names what to do NEXT.
 - **Fix-or-record rule:** a bug found mid-feature is either blocking (fix now), small+same-file (fix now), or everything else (`/b` record, do not expand scope).
-- **Slash commands:** `/n` new feature, `/f` finalize, `/fs` finalize + full pipeline, `/b` bug record, `/bs` bug success, `/t` troubleshoot, `/w` what's open. Available via the claude-config plugin (`claude --plugin-dir ~/claude-config`).
+- **Slash commands:** `/n` new feature, `/f` finalize, `/fs` finalize + full pipeline, `/b` bug record, `/bs` bug success, `/t` troubleshoot, `/w` what's open. Available via the claude-rails plugin (`claude --plugin-dir ~/claude-rails`).
 
 ## Plugin Enforcement
 

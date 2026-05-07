@@ -4,11 +4,11 @@ Copy this file into your project's `.claude/rules/` directory. Defines where hoo
 
 ## Invariants
 
-- Two pools exist: the **global pool** at `~/.claude/hooks/` (symlinked from `claude-config/global/hooks/` by sync) + `~/.claude/settings.json` wiring, and the **project-local pool** at `<project>/.claude/hooks/` + `<project>/.claude/settings.json` wiring. Both are invoked on the same Claude Code events. Project hooks **layer on top** of global hooks -- they do not replace them.
+- Two pools exist: the **global pool** at `~/.claude/hooks/` (symlinked from `claude-rails/global/hooks/` by sync) + `~/.claude/settings.json` wiring, and the **project-local pool** at `<project>/.claude/hooks/` + `<project>/.claude/settings.json` wiring. Both are invoked on the same Claude Code events. Project hooks **layer on top** of global hooks -- they do not replace them.
 - Global hooks MUST have no project hardcodes. No `case "$REPO_ROOT" in */SpecificProject)` branches. No absolute paths like `/Users/<name>/code/<project>/...`. No references to specific skills, databases, or hostnames. A global hook's behavior depends only on: the file being edited, marker files in the current repo, and content of feature/flow docs in that repo.
 - Project hooks are the right home for project-specific enforcement (Swift Codable safety, redraw-ordering anti-patterns, SQL migration guards, stack-specific linters). They live in the project that cares about them.
 - **Shell/PowerShell parity is required for global hooks.** A global hook without a `.ps1` companion breaks the cross-OS contract. Project hooks may be shell-only if the project only runs on one OS, but that is a tradeoff, not a default.
-- Hook wiring is split. Global hooks are wired in `claude-config/settings.*.json`. Project hooks are wired in `<project>/.claude/settings.json`. Never mix: a global hook should never be listed only in a project's settings, and vice versa.
+- Hook wiring is split. Global hooks are wired in `claude-rails/settings.*.json`. Project hooks are wired in `<project>/.claude/settings.json`. Never mix: a global hook should never be listed only in a project's settings, and vice versa.
 - A hook exists in **exactly one pool**. Duplicating a hook into both pools guarantees they fire twice and drift.
 
 ## How to Apply

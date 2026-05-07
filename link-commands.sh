@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# link-commands.sh -- symlink claude-config/commands into ~/.claude/commands
+# link-commands.sh -- symlink claude-rails/commands into ~/.claude/commands
 # Idempotent: safe to re-run. Backs up any existing real directory first.
 set -euo pipefail
 

@@ -1,6 +1,6 @@
 # Project Hooks
 
-This directory holds hook scripts that fire IN ADDITION to the global hooks synced from `claude-config/hooks/` into `~/.claude/hooks/`. Both sets run on the same Claude Code events -- project hooks layer on top, they do not replace globals.
+This directory holds hook scripts that fire IN ADDITION to the global hooks synced from `claude-rails/hooks/` into `~/.claude/hooks/`. Both sets run on the same Claude Code events -- project hooks layer on top, they do not replace globals.
 
 ## Wiring
 

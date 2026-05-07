@@ -1,6 +1,6 @@
 # Project Agents
 
-This directory holds agents specific to this project. They coexist with global agents synced from `claude-config/agents/` into `~/.claude/agents/`.
+This directory holds agents specific to this project. They coexist with global agents synced from `claude-rails/agents/` into `~/.claude/agents/`.
 
 ## Resolution
 

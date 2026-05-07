@@ -1,4 +1,4 @@
-# link-commands.ps1 -- junction claude-config\commands into %USERPROFILE%\.claude\commands
+# link-commands.ps1 -- junction claude-rails\commands into %USERPROFILE%\.claude\commands
 # Idempotent: safe to re-run. Backs up any existing real directory first.
 
 $RepoDir     = Split-Path -Parent $MyInvocation.MyCommand.Path

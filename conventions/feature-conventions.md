@@ -1,6 +1,6 @@
 # Feature Conventions
 
-Stack-agnostic principles every new feature in every claude-config-synced
+Stack-agnostic principles every new feature in every claude-rails-synced
 repo should follow. Loaded between `rules/` (invariants) and sibling
 docs in the token hierarchy so sessions see them before writing any
 feature doc.
@@ -170,7 +170,7 @@ whole feature doc.
 
 Conventions are stack-agnostic on purpose. Concrete per-stack templates
 (scaffolded file layouts, framework picks, template code) live as
-separate skills under `claude-config/skills/starter-*` when a real
+separate skills under `claude-rails/skills/starter-*` when a real
 project drives one into existence. A project declares in its own
 `CLAUDE.md` which starter it uses, if any. Starters are opt-in and
 additive: the conventions above apply regardless of starter choice.

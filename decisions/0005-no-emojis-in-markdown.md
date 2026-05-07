@@ -10,7 +10,7 @@ Emojis and decorative Unicode (box-drawing characters, stars, checkmarks beyond 
 
 ## Decision
 
-All `.md` files in claude-config and in adopted repos use plain text only. No emojis. No decorative Unicode. Section markers, lists, and emphasis use standard Markdown (`#`, `##`, `-`, `**bold**`, `` `code` `` ) — nothing beyond. Box-drawing diagrams are acceptable when they carry information (hierarchy, flow), but only via the narrow set of standard ASCII art forms; decorative borders are not.
+All `.md` files in claude-rails and in adopted repos use plain text only. No emojis. No decorative Unicode. Section markers, lists, and emphasis use standard Markdown (`#`, `##`, `-`, `**bold**`, `` `code` `` ) — nothing beyond. Box-drawing diagrams are acceptable when they carry information (hierarchy, flow), but only via the narrow set of standard ASCII art forms; decorative borders are not.
 
 ## Consequences
 

@@ -4,70 +4,49 @@
 
 User types a message or invokes a slash command in Claude Code (any OS).
 
-## Steps (current -- plugin era)
+## Steps
 
 | Phase | Mechanism | Trigger | Expected Output |
 |-------|-----------|---------|-----------------|
 | 1 | Slash command / commands/<name>.md | User types /<name> | Skill content injected as context; no shell execution |
-| 2 | PreToolUse (Edit\|Write) / require-feature-doc | Tool call on a covered file | {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow\|deny"}} |
-| 3 | PostToolUse (Edit\|Write) / auto-lint | After Edit or Write tool | none (side effect: formatter runs) |
-| 4 | Stop / stale-feature-check | Session stop | text (if any issues) printed as warning |
+| 2 | PreToolUse (Edit\|Write) / feature-doc coverage | Tool call on a file in an enforcement scope | approve or block (prompt-type hook evaluates coverage) |
+| 3 | PreToolUse (Edit\|Write) / flow-doc presence | Editing a feature doc with ## Surface | approve with optional warning if no flow doc exists |
+| 4 | Stop / stale-feature-check | Session stop | warning text if feature docs are missing sections |
 
-Phase 1 is no longer a hook. Shorthand expansion is replaced by native slash
-commands distributed via the plugin (plugin-distribution.feature.md, 2026-05-04).
-Slash commands are OS-agnostic: no shell subprocess, no manifest parsing, no
-parity scripts. Pasted text containing former shorthand patterns (n:, f:, etc.)
-does not trigger any expansion.
+## Hook Distribution
 
-## Cross-OS Matrix (current)
+Hooks ship via `.claude-plugin/hooks/hooks.json` in the plugin. They auto-wire when the plugin loads -- no per-machine `settings.local.json` wiring needed. All hooks use prompt-type handlers: Claude evaluates enforcement logic directly, no shell subprocess.
+
+This eliminates the cross-platform problem. No paired .sh/.ps1 scripts, no OS detection, no shell parity concerns.
+
+## Cross-OS Matrix
 
 | Mechanism | Mac | Win | Linux |
 |-----------|-----|-----|-------|
 | Slash commands | native (no shell) | native (no shell) | native (no shell) |
-| require-feature-doc | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) |
-| stale-feature-check | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) |
-| require-flow-doc | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) | Claude instructions (CLAUDE.md) |
-| auto-lint | bash auto-lint.sh | pwsh auto-lint.ps1 | bash auto-lint.sh |
+| feature-doc coverage | prompt-type hook | prompt-type hook | prompt-type hook |
+| flow-doc presence | prompt-type hook | prompt-type hook | prompt-type hook |
+| stale-feature-check | prompt-type hook | prompt-type hook | prompt-type hook |
 
-Note: `--plugin-dir` does NOT load the plugin's CLAUDE.md. It loads skills,
-agents, hooks.json, and the plugin's settings.json. The CLAUDE.md enforcement
-instructions (## Plugin Enforcement) apply when working on claude-config itself
-but are NOT auto-distributed to adopted repo sessions via the plugin.
+## Enforcement Gating
 
-Current distribution path for enforcement hooks: per-machine
-`~/.claude/settings.local.json` wiring (see README Quick Start).
+All enforcement hooks check for the `.claude/feature-doc-required` marker file in the current repo. If the marker is absent, hooks approve immediately and exit. This means:
 
-Planned distribution path (not yet implemented): ship a cross-platform
-`settings.json` in the plugin root that wires enforcement hooks without
-requiring per-machine setup. Requires hooks to be written in a cross-platform
-runtime (e.g. Node.js) so a single settings.json entry works on all OSes.
-Tracked in plugin-distribution.feature.md criterion 4.
+- Loading the plugin = hooks are active globally
+- The marker file = opt-in switch per repo
+- `/project-setup` creates the marker when you want enforcement in a repo
 
-Auto-lint (PostToolUse formatter runner) remains as shell scripts because it
-runs real formatting tools (prettier, black, gofmt, etc.) that require a shell
-process. Wire per-machine via `~/.claude/settings.local.json`.
+## Why Prompt-Type Hooks
 
-Shell scripts for all enforcement hooks are retained in global/hooks/ as the
-current hard-enforcement path via manual settings.local.json wiring.
+Prompt-type hooks give Claude a text prompt describing the enforcement logic. Claude evaluates the condition against the current file and context, then returns approve or block. Advantages:
 
-## Historical note: shorthand-expand hook (removed 2026-05-04)
-
-The UserPromptSubmit / shorthand-expand hook intercepted "n:", "f:", "b:", etc.
-and returned additionalContext by parsing shortcuts-manifest.json. It required
-paired .sh + .ps1 scripts per OS, was fragile to junction resolution on Windows,
-and accidentally triggered on pasted text containing shorthand patterns.
-Replaced by native slash commands. Scripts retired to migration/retired-hooks/.
-
-## Why Hooks Stream JSON
-
-Claude Code invokes each hook as a subprocess, piping JSON to stdin, reading
-JSON or plain text from stdout, and interpreting the structured response to
-allow/block tool calls or inject context.
+- Cross-platform by nature (no shell, no subprocess)
+- Auto-wire on plugin load (no settings.json editing)
+- Logic is readable text, not script code
+- Same mechanism works identically on every OS
 
 ## Files Involved
 
-- commands/ (slash command skill files -- replaces shorthand-expand)
-- global/hooks/require-feature-doc.sh, .ps1
-- global/hooks/auto-lint.sh, .ps1
-- global/hooks/stale-feature-check.sh, .ps1
-- settings.*.json (enforcement hook wiring -- local per machine)
+- commands/ (slash command skill files)
+- .claude-plugin/hooks/hooks.json (enforcement hook definitions)
+- global/hooks/hook-lifecycle.flow.md (this file)

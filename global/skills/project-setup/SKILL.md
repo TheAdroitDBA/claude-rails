@@ -7,7 +7,7 @@ description: Set up or audit a project's Claude Code enforcement structure (CLAU
 
 ## Purpose
 
-claude-config exists to **reduce the feeling of being lost** -- for Claude on session start, and for the user when they open the repo cold. Every piece of the framework (CLAUDE.md, rules, memory, feature docs, flow docs, enforcement markers, README runbook) is there to answer one of five orientation questions:
+claude-rails exists to **reduce the feeling of being lost** -- for Claude on session start, and for the user when they open the repo cold. Every piece of the framework (CLAUDE.md, rules, memory, feature docs, flow docs, enforcement markers, README runbook) is there to answer one of five orientation questions:
 
 1. **Where am I?** -- what does this repo do, what stack, what are the commands
 2. **What's in flight?** -- what is the current session supposed to be working on
@@ -94,7 +94,7 @@ A small CRUD app with no flow docs is PASS. A 50k-line app with Metal rendering,
 
 ### Q6: Do existing feature docs honor the framework conventions?
 
-- Read `~/claude-config/conventions/feature-conventions.md` (or its
+- Read `~/claude-rails/conventions/feature-conventions.md` (or its
   symlink at `~/.claude/conventions/feature-conventions.md` if present).
 - Spot-check up to 5 existing `*.feature.md` files in the repo. For
   each, flag any obvious convention violation: persistence that
@@ -215,7 +215,7 @@ If a proposed target already exists in the repo (e.g., someone partially migrate
 
 ### 3f: Detect stale scaffolded artifacts
 
-Older versions of `/project-setup` copied framework invariant rules into adopted repos (`agent-placement.md`, `skill-placement.md`, `hook-placement.md`). Under the current design these are NOT distributed -- they describe claude-config's own discipline. If any are found, list as **stale scaffold**, propose removal in Step 5, execute in Step 7.
+Older versions of `/project-setup` copied framework invariant rules into adopted repos (`agent-placement.md`, `skill-placement.md`, `hook-placement.md`). Under the current design these are NOT distributed -- they describe claude-rails's own discipline. If any are found, list as **stale scaffold**, propose removal in Step 5, execute in Step 7.
 
 ```bash
 echo "=== Stale scaffolded artifacts ==="
@@ -300,7 +300,7 @@ mkdir -p .claude/rules .claude/agents .claude/hooks .claude/skills
 
 Only create `memory/` if the project does not already use `.claude/memory/` for the same purpose. Do not create `docs/features/` or `docs/flows/` -- feature and flow docs are colocated next to the code they describe.
 
-**Exception: the framework repo itself.** If `PROJECT_ROOT` is `claude-config` (detectable via `basename $(pwd)` == `claude-config` OR presence of top-level `.claude-plugin/plugin.json` + `memory-snippet.md` + `commands/`), skip `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/`. Claude-config **is** the global pool -- it has nothing to layer on top of itself. Only `.claude/rules/` is valid in claude-config (it consumes its own rules templates during its own work sessions). This rule does NOT apply to any other repo.
+**Exception: the framework repo itself.** If `PROJECT_ROOT` is `claude-rails` (detectable via `basename $(pwd)` == `claude-rails` OR presence of top-level `.claude-plugin/plugin.json` + `memory-snippet.md` + `commands/`), skip `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/`. Claude-config **is** the global pool -- it has nothing to layer on top of itself. Only `.claude/rules/` is valid in claude-rails (it consumes its own rules templates during its own work sessions). This rule does NOT apply to any other repo.
 
 ### 6b: Enforcement markers (only if missing)
 
@@ -360,7 +360,7 @@ If there is no tracker at all: read `~/.claude/skills/project-setup/templates/kn
 
 ### 6i: Rules templates (in .claude/rules/, only if approved)
 
-Framework invariants (where agents/skills/hooks live across the two pools) are captured inline in the scaffolded CLAUDE.md (see Step 6c). Adopted repos do NOT get copies of `agent-placement.md`, `skill-placement.md`, or `hook-placement.md` -- those describe claude-config's own discipline, not a per-project convention.
+Framework invariants (where agents/skills/hooks live across the two pools) are captured inline in the scaffolded CLAUDE.md (see Step 6c). Adopted repos do NOT get copies of `agent-placement.md`, `skill-placement.md`, or `hook-placement.md` -- those describe claude-rails's own discipline, not a per-project convention.
 
 **Domain rule templates** -- when approved, read the sidecar and write to `<project>/.claude/rules/<name>.md` (skip if destination already exists):
 - `error-ux.md`: read `~/.claude/skills/project-setup/templates/rules-error-ux.md`
@@ -398,7 +398,7 @@ If the repo has a `repo_url` (check `git remote get-url origin`): read `~/.claud
 
 Enforcement is distributed via the `## Plugin Enforcement` section in CLAUDE.md (Step 6c). No per-project hook wiring or shell scripts are needed. The instructions are stored in the repo itself for portability -- the repo is self-contained.
 
-If the mechanical check (Step 2) shows `~/.claude/settings.local.json` does not wire the shell-based enforcement hooks, that is acceptable: Claude enforces the rules via the CLAUDE.md instructions. Point the user at the claude-config README Quick Start only if they specifically want the shell hook hard-enforcement as a supplementary layer.
+If the mechanical check (Step 2) shows `~/.claude/settings.local.json` does not wire the shell-based enforcement hooks, that is acceptable: Claude enforces the rules via the CLAUDE.md instructions. Point the user at the claude-rails README Quick Start only if they specifically want the shell hook hard-enforcement as a supplementary layer.
 
 ## Step 7: Execute migrations
 

@@ -9,11 +9,11 @@ Adds a framework-level append-only stream of architectural decision records (ADR
 both
 
 - framework: the `decisions/` pattern, the file format, and the `## Honors` section are scaffolded into adopted repos by `/project-setup` so they can maintain their own local decision streams plus inherit framework-level decisions.
-- dogfood: claude-config seeds its own decisions (colocated-docs, tests-as-peer-feature, shell/PS parity, two-pool placement model, no-emojis) into `decisions/` and cites them from its own feature docs to prove the pattern before shipping it.
+- dogfood: claude-rails seeds its own decisions (colocated-docs, tests-as-peer-feature, shell/PS parity, two-pool placement model, no-emojis) into `decisions/` and cites them from its own feature docs to prove the pattern before shipping it.
 
 ## Success Criteria
 
-1. `decisions/` directory exists at claude-config repo root with a `README.md` index and a `TEMPLATE.md` seed file. The index lists every decision by ID, title, and status (`ACCEPTED`, `SUPERSEDED`, `DEPRECATED`, `DRAFT`).
+1. `decisions/` directory exists at claude-rails repo root with a `README.md` index and a `TEMPLATE.md` seed file. The index lists every decision by ID, title, and status (`ACCEPTED`, `SUPERSEDED`, `DEPRECATED`, `DRAFT`).
 2. Every decision record file is named `NNNN-slug.md` where `NNNN` is a four-digit monotonically increasing integer (zero-padded) and `slug` is lowercase-hyphenated.
 3. Every decision record contains these sections in order: `# NNNN: <title>`, `## Status`, `## Context`, `## Decision`, `## Consequences`, `## Alternatives Considered`, `## Affected Features`.
 4. `## Status` contains exactly one of: `ACCEPTED — YYYY-MM-DD`, `SUPERSEDED-BY NNNN — YYYY-MM-DD`, `DEPRECATED — YYYY-MM-DD`, or `DRAFT`. A record is never silently removed; supersession is the only retirement path.
@@ -40,7 +40,7 @@ IN PROGRESS
 - [ ] NEXT: user reviews the landed state; decide whether to pilot Honors in two more feature docs (framework-portability honors 0003, global-pool-namespace honors 0004) or move on to contracts
 - [ ] Draft `/project-setup` integration (scaffold `decisions/README.md` + `TEMPLATE.md` heredocs, optional `## Honors Decisions` section in scaffolded CLAUDE.md)
 - [ ] Supersession-check hook (separate follow-up feature, not this one): warn on feature docs citing `SUPERSEDED-BY` or `DEPRECATED` decisions
-- [ ] Bump claude-config VERSION once the `/project-setup` integration lands
+- [ ] Bump claude-rails VERSION once the `/project-setup` integration lands
 
 ## Files
 

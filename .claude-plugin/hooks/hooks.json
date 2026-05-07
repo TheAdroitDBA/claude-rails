@@ -1,0 +1,36 @@
+{
+  "description": "claude-rails enforcement hooks. Auto-wire on plugin load. Enforcement is gated by the .claude/feature-doc-required marker in each repo.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "ENFORCEMENT: Feature-doc coverage check. Before allowing this edit, follow these steps exactly:\n\n1. SKIP if the file path contains `/docs/`, `test`, `spec`, ends in `.json`, `.yml`, `.yaml`, `.toml`, `.md`, or the filename starts with `.`.\n2. Walk up from the file's directory looking for `.claude/feature-doc-required`. If not found up to the repo root, APPROVE (enforcement not active).\n3. Read `.claude/feature-doc-mode` at the scope root (default: `block`). If `off`, APPROVE.\n4. Walk up from the file's directory to the repo root collecting all `*.feature.md` files.\n5. For each feature doc: if it has a `## Scope` section, check whether the file's repo-relative path matches a scope glob. If it has no `## Scope`, it covers its directory and all descendants.\n6. If a feature doc covers the file, APPROVE. If none do: in `warn` mode, APPROVE but print a warning. In `block` mode, BLOCK and explain which feature doc to create or which `## Scope` to extend."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "ENFORCEMENT: Flow-doc presence check. After the feature-doc check passes, apply this additional check:\n\n1. SKIP unless the file being edited is a `*.feature.md` file that has a `## Surface` section with non-trivial content.\n2. If the feature doc has a `## Surface` section, verify a `*.flow.md` file exists within the same directory or a subdirectory covered by the feature's scope.\n3. If a flow doc exists, APPROVE.\n4. If no flow doc exists, APPROVE but print a warning: 'Feature has a ## Surface declaration but no *.flow.md -- create one to document entry points and failure modes.'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "ENFORCEMENT: Stale feature-doc check. Before stopping, perform this check:\n\n1. Walk up from the current directory looking for `.claude/feature-doc-required`. If not found, skip this check entirely.\n2. Review any `*.feature.md` files that were touched or read during this session.\n3. For each such feature doc, check whether it has both a `## Success Criteria` section and a `## Status` section.\n4. If any feature doc is missing either section, print a warning listing the file and which section is missing.\n5. After printing any warnings, APPROVE the stop (this check is advisory, not blocking)."
+          }
+        ]
+      }
+    ]
+  }
+}

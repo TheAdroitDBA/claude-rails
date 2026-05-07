@@ -1,27 +1,27 @@
 ---
 name: hook-health
-description: Verifies claude-config's enforcement hooks are wired correctly on this machine. Reads ~/.claude/settings.local.json, locates each claude-config hook, and checks the script exists, the interpreter is on PATH, the canonical hooks are wired on the right events, and there is no OS mismatch or duplicate wiring. Read-only.
+description: Verifies claude-rails's enforcement hooks are wired correctly on this machine. Reads ~/.claude/settings.local.json, locates each claude-rails hook, and checks the script exists, the interpreter is on PATH, the canonical hooks are wired on the right events, and there is no OS mismatch or duplicate wiring. Read-only.
 ---
 
 # Hook Health
 
-You are verifying that claude-config's enforcement hooks are wired correctly on this machine. The user invokes this skill when they are unsure whether `require-feature-doc`, `auto-lint`, or `stale-feature-check` will actually fire -- e.g. after editing `~/.claude/settings.local.json`, switching machines, or installing a new interpreter.
+You are verifying that claude-rails's enforcement hooks are wired correctly on this machine. The user invokes this skill when they are unsure whether `require-feature-doc`, `auto-lint`, or `stale-feature-check` will actually fire -- e.g. after editing `~/.claude/settings.local.json`, switching machines, or installing a new interpreter.
 
 This skill is **read-only**. Never write, fix, or run any installation step. Remediation is advisory.
 
 ## Step 1: Read settings.local.json
 
-Read `~/.claude/settings.local.json`. If the file is missing, empty, or contains no hook entries whose `command` string contains `claude-config/global/hooks/`, report:
+Read `~/.claude/settings.local.json`. If the file is missing, empty, or contains no hook entries whose `command` string contains `claude-rails/global/hooks/`, report:
 
-> No claude-config hooks detected on this machine.
+> No claude-rails hooks detected on this machine.
 >
-> Remediation: see claude-config README.md Quick Start step 3 to wire enforcement hooks in `~/.claude/settings.local.json`.
+> Remediation: see claude-rails README.md Quick Start step 3 to wire enforcement hooks in `~/.claude/settings.local.json`.
 
 Then stop. Do not run further checks.
 
-## Step 2: Enumerate claude-config hooks
+## Step 2: Enumerate claude-rails hooks
 
-For every `command` string under `hooks.*[].hooks[]` whose value contains `claude-config/global/hooks/`, record:
+For every `command` string under `hooks.*[].hooks[]` whose value contains `claude-rails/global/hooks/`, record:
 
 - **Event**: the parent key (`PreToolUse`, `PostToolUse`, `Stop`, or `UserPromptSubmit`).
 - **Matcher**: the entry's `matcher` field (often `Edit|Write`; absent on `Stop`).
@@ -40,7 +40,7 @@ For each enumerated hook, run these checks via Bash tool calls. Record `PASS` / 
 
 `test -f <script-path> && echo PASS || echo FAIL`
 
-FAIL detail: the resolved path that does not exist. Remediation: verify the path in `settings.local.json` matches the actual claude-config clone location on this machine.
+FAIL detail: the resolved path that does not exist. Remediation: verify the path in `settings.local.json` matches the actual claude-rails clone location on this machine.
 
 ### Check B -- interpreter on PATH
 
@@ -119,7 +119,7 @@ Emit a single Markdown report in this shape:
 Closing line:
 
 - All green (zero failures, zero warnings): `Hooks are wired and reachable.`
-- Any failure: `Fix the failure(s) above. Common fix: re-check ~/.claude/settings.local.json against claude-config README Quick Start step 3.`
+- Any failure: `Fix the failure(s) above. Common fix: re-check ~/.claude/settings.local.json against claude-rails README Quick Start step 3.`
 - Warnings only: `Hooks are reachable but have warnings; review above.`
 
 Never emit an overall PASS verdict for hook-health itself -- per-check PASS/FAIL is objective from filesystem state, but the user judges whether the configuration is acceptable.
@@ -128,6 +128,6 @@ Never emit an overall PASS verdict for hook-health itself -- per-check PASS/FAIL
 
 - Do not modify any file. Read-only.
 - Do not auto-fix wiring or rewrite settings.local.json.
-- Do not assume claude-config's clone location. Every path comes from settings.local.json content.
+- Do not assume claude-rails's clone location. Every path comes from settings.local.json content.
 - Do not extrapolate beyond hook wiring. Manifest correctness, feature-doc enforcement state, and other framework concerns are out of scope.
 - Do not run shell commands beyond the read-only checks listed in Step 3 (`test -f`, `command -v`, `uname -s`).
