@@ -58,7 +58,7 @@ Three knobs control enforcement per repo:
 2. **Enforcement mode** (`.claude/feature-doc-mode`) -- `off`, `warn`, or `block` (default: `block`).
 3. **Feature scope** -- `## Scope` globs in feature docs determine which files each feature doc covers. No `## Scope` means the doc covers its directory and all descendants.
 
-Hooks ship via `hooks/hooks.json` in the plugin. They auto-wire when the plugin loads -- no per-machine `settings.local.json` wiring needed. The hooks use prompt-type handlers (Claude evaluates enforcement logic directly), making them fully cross-platform with no shell scripts.
+Hooks ship via `hooks/hooks.json` in the plugin. They auto-wire when the plugin loads. The hooks use prompt-type handlers (Claude evaluates enforcement logic directly), making them fully cross-platform.
 
 Three enforcement hooks:
 - **PreToolUse** (Edit/Write/MultiEdit/NotebookEdit): feature-doc coverage check -- blocks edits to files not covered by a feature doc.

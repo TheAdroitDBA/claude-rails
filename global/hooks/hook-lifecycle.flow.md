@@ -15,9 +15,7 @@ User types a message or invokes a slash command in Claude Code (any OS).
 
 ## Hook Distribution
 
-Hooks ship via `.claude-plugin/hooks/hooks.json` in the plugin. They auto-wire when the plugin loads -- no per-machine `settings.local.json` wiring needed. All hooks use prompt-type handlers: Claude evaluates enforcement logic directly, no shell subprocess.
-
-This eliminates the cross-platform problem. No paired .sh/.ps1 scripts, no OS detection, no shell parity concerns.
+Hooks ship via `.claude-plugin/hooks/hooks.json` in the plugin. They auto-wire when the plugin loads. All hooks use prompt-type handlers: Claude evaluates enforcement logic directly.
 
 ## Cross-OS Matrix
 

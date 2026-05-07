@@ -138,7 +138,7 @@ For a project that already has code, docs, or a previous Claude Code setup:
 
 ### Enforcement hooks
 
-Enforcement hooks ship with the plugin and auto-wire when it loads -- no manual `settings.local.json` editing needed. They use prompt-type handlers (Claude evaluates the enforcement logic directly), so they work identically on Mac, Windows, and Linux.
+Enforcement hooks ship with the plugin and auto-wire when it loads. They use prompt-type handlers (Claude evaluates the enforcement logic directly), so they work identically on Mac, Windows, and Linux.
 
 The hooks are globally active but only enforce in repos that have opted in. When `/project-setup` creates the `.claude/feature-doc-required` marker, that repo comes under enforcement. Repos without the marker are unaffected.
 

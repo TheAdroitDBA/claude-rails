@@ -84,5 +84,5 @@ Closing lines:
 ## Do not
 
 - Do not modify any file. Read-only.
-- Do not check for shell scripts, settings.local.json, or interpreter availability. Those are not part of the current hook model.
+- Do not check for interpreter availability. Hooks are prompt-type handlers evaluated by Claude directly.
 - Do not run shell commands beyond read-only filesystem checks.
