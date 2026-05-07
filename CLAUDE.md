@@ -10,7 +10,7 @@ ALWAYS read MEMORY.md first. It is the single canonical description of the frame
 
 ## Build & Test
 
-No compiled build. Distribution is via Claude Code's native plugin system: register in `~/.claude/settings.json` or pass `claude --plugin-dir /path/to/claude-rails`. See README.md Quick Start. Slash commands are wired via `link-commands.sh` / `link-commands.ps1` (one-time per machine). Edits to the repo are live immediately.
+No compiled build. Distribution is via Claude Code's native plugin system: register in `~/.claude/settings.json` (one-time). Pass `claude --plugin-dir /path/to/claude-rails` only for testing without committing to settings. See README.md Quick Start. Slash commands are wired via `link-commands.sh` / `link-commands.ps1` (one-time per machine). Edits to the repo are live immediately.
 
 ## Conventions
 

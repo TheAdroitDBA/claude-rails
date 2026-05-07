@@ -84,13 +84,13 @@ Add claude-rails as a local plugin source in your user settings so it loads auto
 
 Replace `/path/to/claude-rails` with your actual clone path (e.g. `~/claude-rails` on Mac, `/code/claude-rails` on Linux, `C:\\Code\\claude-rails` on Windows -- note the double backslashes in JSON).
 
-**Alternative**: if you prefer not to edit settings, you can pass `--plugin-dir` on every launch instead:
+**Testing only**: to try the plugin without committing it to your settings, pass `--plugin-dir` on a single launch:
 
 ```bash
 claude --plugin-dir ~/claude-rails
 ```
 
-But the settings approach means you never have to remember the flag.
+This is useful for testing a branch or validating a change before updating settings.
 
 ### Step 4: Verify
 
@@ -106,7 +106,7 @@ If any of these fail, check that Step 2 completed (symlink exists at `~/.claude/
 
 For a brand-new project that has no Claude Code structure yet:
 
-1. Start Claude Code with the plugin loaded (`--plugin-dir`).
+1. Start Claude Code (the plugin loads automatically via `settings.json`).
 2. Run `/project-setup` inside the repo. It will:
    - Audit the repo against five orientation questions (where am I, what's in flight, what's broken, what does done mean, how do pipelines work).
    - Scaffold `CLAUDE.md` with token hierarchy, build commands, and enforcement instructions.
@@ -124,7 +124,7 @@ Enforcement starts in `warn` mode by default. Switch to `block` in `.claude/feat
 
 For a project that already has code, docs, or a previous Claude Code setup:
 
-1. Start Claude Code with the plugin loaded (`--plugin-dir`).
+1. Start Claude Code (the plugin loads automatically via `settings.json`).
 2. Run `/project-setup` inside the repo. It is idempotent -- safe to re-run. It will:
    - Read existing `CLAUDE.md`, `README.md`, and `MEMORY.md` before asking questions, so it does not re-ask what it can already see.
    - Audit all five orientation questions and report PASS / WEAK / FAIL for each.
