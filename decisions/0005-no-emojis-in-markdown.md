@@ -15,7 +15,7 @@ All `.md` files in claude-rails and in adopted repos use plain text only. No emo
 ## Consequences
 
 - Framework docs stay diffable, greppable, and tokenizer-neutral.
-- Writers must resist the temptation to add visual flourish. The rule is bright-line: any emoji is a violation, regardless of how "tasteful" it looks. A post-commit lint or the `auto-lint` hook can catch violations mechanically.
+- Writers must resist the temptation to add visual flourish. The rule is bright-line: any emoji is a violation, regardless of how "tasteful" it looks.
 - Generated output (Claude's own replies inside a session) is governed separately by CLAUDE.md guidance and by Claude Code's own style. The rule here applies to files that land in the repo.
 - The rule is explicit in `MEMORY.md` as Hard Rule #1, inlined into `/project-setup`'s scaffolded `CLAUDE.md` conventions section, and reinforced in every rules-template file so adopted repos inherit it.
 

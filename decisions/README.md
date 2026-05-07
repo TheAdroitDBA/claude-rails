@@ -4,7 +4,7 @@ Append-only stream of framework-level architectural decision records (ADRs).
 
 One file per decision. Filename: `NNNN-slug.md`. Numbers are monotonic and never reused. Decisions are retired only by supersession — a newer record flips the older one to `SUPERSEDED-BY NNNN`. Nothing is deleted.
 
-See `decision-records.feature.md` in this directory for the governing feature doc. See `TEMPLATE.md` for the starter shape.
+See `TEMPLATE.md` for the starter shape.
 
 ## How to Cite a Decision
 
@@ -13,7 +13,7 @@ From a feature doc:
 ```
 ## Honors
 decisions/0001
-decisions/0003
+decisions/0004
 ```
 
 From a CLAUDE.md (adopted repo):
@@ -21,7 +21,7 @@ From a CLAUDE.md (adopted repo):
 ```
 ## Honors Decisions
 - decisions/0001 — Colocated sibling docs
-- decisions/0003 — Shell/PowerShell hook parity
+- decisions/0004 — Two-pool placement
 ```
 
 ## Index
@@ -30,7 +30,6 @@ From a CLAUDE.md (adopted repo):
 |----|-------|--------|------|
 | 0001 | Colocated sibling docs (feature.md + flow.md next to code) | ACCEPTED | 2026-04-21 |
 | 0002 | Tests are peer features, not colocated leaves | ACCEPTED | 2026-04-21 |
-| 0003 | Shell and PowerShell hook parity | ACCEPTED | 2026-04-21 |
 | 0004 | Two-pool placement for skills, agents, and hooks | ACCEPTED | 2026-04-21 |
 | 0005 | No emojis or graphical characters in .md files | ACCEPTED | 2026-04-21 |
 | 0006 | Global-pool skills must discover, not hardcode | ACCEPTED | 2026-04-21 |

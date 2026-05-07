@@ -1,133 +1,88 @@
 ---
 name: hook-health
-description: Verifies claude-rails's enforcement hooks are wired correctly on this machine. Reads ~/.claude/settings.local.json, locates each claude-rails hook, and checks the script exists, the interpreter is on PATH, the canonical hooks are wired on the right events, and there is no OS mismatch or duplicate wiring. Read-only.
+description: Verifies claude-rails enforcement hooks are active. Checks that the plugin is loaded, hooks/hooks.json exists, and enforcement markers are correctly placed in the current repo. Read-only.
 ---
 
 # Hook Health
 
-You are verifying that claude-rails's enforcement hooks are wired correctly on this machine. The user invokes this skill when they are unsure whether `require-feature-doc`, `auto-lint`, or `stale-feature-check` will actually fire -- e.g. after editing `~/.claude/settings.local.json`, switching machines, or installing a new interpreter.
+You are verifying that claude-rails's enforcement hooks are active in the current session. The user invokes this skill when they are unsure whether enforcement is working -- e.g. after registering the plugin, switching machines, or adopting a new repo.
 
-This skill is **read-only**. Never write, fix, or run any installation step. Remediation is advisory.
+This skill is **read-only**. Never write or modify any file. Remediation is advisory.
 
-## Step 1: Read settings.local.json
+## Step 1: Verify plugin is loaded
 
-Read `~/.claude/settings.local.json`. If the file is missing, empty, or contains no hook entries whose `command` string contains `claude-rails/global/hooks/`, report:
+Check whether claude-rails skills are discoverable in this session. If `/project-setup` or `/software-architect` are not available, the plugin is not loaded.
 
-> No claude-rails hooks detected on this machine.
->
-> Remediation: see claude-rails README.md Quick Start step 3 to wire enforcement hooks in `~/.claude/settings.local.json`.
+Report:
+- PASS: plugin is loaded (skills are discoverable)
+- FAIL: plugin not loaded. Remediation: register claude-rails in `~/.claude/settings.json` (see README Quick Start step 3) or launch with `--plugin-dir`.
 
-Then stop. Do not run further checks.
+## Step 2: Verify hooks.json exists
 
-## Step 2: Enumerate claude-rails hooks
+Check whether the plugin's hooks file exists. The expected location is the `hooks/hooks.json` directory inside the plugin's `.claude-plugin/` directory.
 
-For every `command` string under `hooks.*[].hooks[]` whose value contains `claude-rails/global/hooks/`, record:
+Report:
+- PASS: hooks.json found with PreToolUse and Stop entries
+- FAIL: hooks.json missing or malformed. Remediation: ensure the claude-rails clone is intact and the plugin path is correct.
 
-- **Event**: the parent key (`PreToolUse`, `PostToolUse`, `Stop`, or `UserPromptSubmit`).
-- **Matcher**: the entry's `matcher` field (often `Edit|Write`; absent on `Stop`).
-- **Command**: the full `command` string verbatim.
-- **Script path**: the path component of the command (everything after `bash ` or `pwsh -... -File ` or `powershell -... -File `).
-- **Hook name**: the script basename without extension (e.g. `require-feature-doc`).
-- **Extension**: `.sh` or `.ps1`.
+## Step 3: Check enforcement markers in current repo
 
-Build the list before running any check. Treat each list entry as one row in the final report.
+If the user is inside a repo, check:
 
-## Step 3: Per-hook checks
+1. Does `.claude/feature-doc-required` exist? If not, enforcement is inactive in this repo (by design -- this is not a failure, just informational).
+2. If the marker exists, what is `.claude/feature-doc-mode`? Report the current mode (`off`, `warn`, `block`, or default `block` if file is absent).
 
-For each enumerated hook, run these checks via Bash tool calls. Record `PASS` / `FAIL` / `WARN` per check.
+Report:
+- ACTIVE (block): marker present, mode is block
+- ACTIVE (warn): marker present, mode is warn
+- INACTIVE: no marker file. Enforcement hooks will approve all edits in this repo. Run `/project-setup` to opt in.
+- OFF: marker present but mode is `off`. Enforcement is explicitly disabled.
 
-### Check A -- script file exists
+## Step 4: Spot-check enforcement hooks
 
-`test -f <script-path> && echo PASS || echo FAIL`
+List the three enforcement hooks and their expected behavior:
 
-FAIL detail: the resolved path that does not exist. Remediation: verify the path in `settings.local.json` matches the actual claude-rails clone location on this machine.
+| Hook | Event | Matcher | Purpose |
+|------|-------|---------|---------|
+| feature-doc coverage | PreToolUse | Edit\|Write\|MultiEdit\|NotebookEdit | Blocks edits to files not covered by a feature doc |
+| flow-doc presence | PreToolUse | Edit\|Write\|MultiEdit\|NotebookEdit | Warns when feature doc has ## Surface but no flow doc |
+| stale-feature-check | Stop | * | Warns if touched feature docs are missing sections |
 
-### Check B -- interpreter on PATH
+All three are prompt-type hooks (Claude evaluates the logic directly). They require no shell scripts, no interpreter, and no per-machine wiring.
 
-For `.sh` extension: `command -v bash >/dev/null && echo PASS || echo FAIL`
-For `.ps1` extension: `command -v pwsh >/dev/null || command -v powershell >/dev/null && echo PASS || echo FAIL`
+## Step 5: Report
 
-FAIL detail: the missing interpreter name. Remediation: install bash (Mac/Linux) or PowerShell 7+ (`pwsh`) and retry.
-
-### Check C -- OS match
-
-Detect OS via `uname -s` (`Linux` / `Darwin`) or absence of uname (Windows).
-
-- On Linux/Darwin: extension must be `.sh`. A `.ps1` command is FAIL: "PowerShell command wired on Mac/Linux; use the bash form."
-- On Windows: extension must be `.ps1`. A `.sh` command is FAIL: "bash command wired on Windows; use the pwsh form."
-
-## Step 4: Canonical-hook checks
-
-These are repo-level checks (not per-hook). The framework ships exactly three canonical enforcement hooks. For each name + expected event, walk the enumerated list:
-
-| Hook name | Expected event | Expected matcher |
-|---|---|---|
-| `require-feature-doc` | `PreToolUse` | `Edit\|Write` |
-| `auto-lint` | `PostToolUse` | `Edit\|Write` |
-| `stale-feature-check` | `Stop` | (none) |
-
-For each row:
-
-- **MISSING** if no enumerated hook matches the name (any event).
-- **MISWIRED** if the hook is enumerated but on the wrong event or wrong matcher. Report the actual event/matcher alongside the expected.
-- **PASS** otherwise.
-
-A fourth optional hook -- `require-flow-doc` (`PreToolUse` `Edit|Write`) -- is reported as INFO if present, never as MISSING. Do not flag its absence.
-
-## Step 5: Cross-file duplicate check
-
-Read `~/.claude/settings.json` if it exists. For each hook command in `settings.local.json`, check whether the same `command` string also appears in `settings.json`. If so, emit a WARN per duplicate:
-
-> Hook `<command>` is wired in both `settings.json` and `settings.local.json`. Claude Code unions hook arrays; the hook will fire twice.
-
-Remediation: keep wiring in `settings.local.json` only and remove the duplicate from `settings.json`.
-
-## Step 6: Report
-
-Emit a single Markdown report in this shape:
+Emit a single Markdown report:
 
 ```
 ## Hook Health
 
-### Per-hook checks
+| Check | Status | Detail |
+|-------|--------|--------|
+| Plugin loaded | PASS/FAIL | ... |
+| hooks.json present | PASS/FAIL | ... |
+| Enforcement markers | ACTIVE/INACTIVE/OFF | mode: block/warn/off |
 
-| Hook | Event | File exists | Interpreter | OS match |
-|---|---|---|---|---|
-| require-feature-doc | PreToolUse | PASS | PASS (bash) | PASS |
-| auto-lint | PostToolUse | PASS | PASS (bash) | PASS |
-| stale-feature-check | Stop | FAIL: /missing/path | -- | -- |
+### Enforcement hooks (via plugin)
 
-### Canonical hooks
-
-| Hook | Status | Detail |
-|---|---|---|
-| require-feature-doc | PASS | wired on PreToolUse Edit|Write |
-| auto-lint | PASS | wired on PostToolUse Edit|Write |
-| stale-feature-check | FAIL | wired on Stop, but file missing |
-
-### Warnings
-
-(None) -- or a bullet list of WARN entries.
+| Hook | Type | Status |
+|------|------|--------|
+| feature-doc coverage | prompt | active (auto-wired by plugin) |
+| flow-doc presence | prompt | active (auto-wired by plugin) |
+| stale-feature-check | prompt | active (auto-wired by plugin) |
 
 ### Summary
-
-<N> failures, <M> warnings.
 
 <closing line>
 ```
 
-Closing line:
-
-- All green (zero failures, zero warnings): `Hooks are wired and reachable.`
-- Any failure: `Fix the failure(s) above. Common fix: re-check ~/.claude/settings.local.json against claude-rails README Quick Start step 3.`
-- Warnings only: `Hooks are reachable but have warnings; review above.`
-
-Never emit an overall PASS verdict for hook-health itself -- per-check PASS/FAIL is objective from filesystem state, but the user judges whether the configuration is acceptable.
+Closing lines:
+- Plugin loaded + markers active: `Enforcement is active. Edits to uncovered files will be blocked/warned.`
+- Plugin loaded + no markers: `Plugin is loaded but this repo has not opted into enforcement. Run /project-setup to set up markers.`
+- Plugin not loaded: `Plugin is not loaded. Register it in ~/.claude/settings.json or use --plugin-dir.`
 
 ## Do not
 
 - Do not modify any file. Read-only.
-- Do not auto-fix wiring or rewrite settings.local.json.
-- Do not assume claude-rails's clone location. Every path comes from settings.local.json content.
-- Do not extrapolate beyond hook wiring. Manifest correctness, feature-doc enforcement state, and other framework concerns are out of scope.
-- Do not run shell commands beyond the read-only checks listed in Step 3 (`test -f`, `command -v`, `uname -s`).
+- Do not check for shell scripts, settings.local.json, or interpreter availability. Those are not part of the current hook model.
+- Do not run shell commands beyond read-only filesystem checks.

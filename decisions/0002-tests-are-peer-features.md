@@ -29,7 +29,5 @@ Tests live in `tests/<suite>/` at the repo root. Each suite is a directory conta
 ## Affected Features
 
 - rules/test-placement.md
-- testing-convention.feature.md
 - MEMORY.md (Rules Templates section listing test-placement.md as opinionated template)
-- tests/shortcuts/shortcuts.feature.md (dogfood example of the pattern)
 - global/skills/project-setup/SKILL.md (scaffolds tests/ into new repos)

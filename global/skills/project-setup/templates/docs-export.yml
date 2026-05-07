@@ -1,5 +1,5 @@
 # docs.export.yml -- declares what this repo publishes to http://docs
-# Full spec: docs-export.feature.md in the claude-rails clone.
+# Full spec: see claude-rails docs/glossary.md for the docs export convention.
 project: [Project Name]
 repo_url: [origin URL]
 branch: main

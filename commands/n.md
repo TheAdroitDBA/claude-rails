@@ -17,7 +17,7 @@ Follow these steps in order. Do not skip steps or begin implementation before st
 
 5. Check for an existing *.feature.md near the code (informed by the flow doc if one exists).
 
-6. Create $ARGUMENTS.feature.md next to the primary code file if none exists. Include: ## What It Does, ## Concern (framework / dogfood / both), ## Success Criteria, ## Status, ### Progress, ## Scope, ## Files.
+6. Create $ARGUMENTS.feature.md next to the primary code file if none exists. Include: ## What It Does, ## Success Criteria, ## Status, ### Progress, ## Scope, ## Files.
 
 7. Include a ### Progress checklist under ## Status with the planned implementation steps.
 

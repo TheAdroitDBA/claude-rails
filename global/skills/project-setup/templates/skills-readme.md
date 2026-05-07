@@ -1,6 +1,6 @@
 # Project Skills
 
-This directory holds skills specific to this project. They coexist with global skills synced from `claude-rails/skills/` into `~/.claude/skills/`.
+This directory holds skills specific to this project. They coexist with global skills provided by the claude-rails plugin.
 
 ## Resolution
 

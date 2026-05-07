@@ -94,8 +94,7 @@ A small CRUD app with no flow docs is PASS. A 50k-line app with Metal rendering,
 
 ### Q6: Do existing feature docs honor the framework conventions?
 
-- Read `~/claude-rails/conventions/feature-conventions.md` (or its
-  symlink at `~/.claude/conventions/feature-conventions.md` if present).
+- Read `conventions/feature-conventions.md` from the claude-rails plugin directory.
 - Spot-check up to 5 existing `*.feature.md` files in the repo. For
   each, flag any obvious convention violation: persistence that
   bypasses a Store seam (raw SQL or file paths in UI/notification
@@ -108,7 +107,7 @@ A small CRUD app with no flow docs is PASS. A 50k-line app with Metal rendering,
 - Zero feature docs OR zero violations = PASS. First-time adoption
   repos with no `## Deviation` sections anywhere are expected; conventions
   apply going forward, not retroactively (see
-  `feature-conventions.feature.md` criterion 7). Do not rewrite
+  `conventions/feature-conventions.md` conventions). Do not rewrite
   existing docs during audit; report the gap and move on.
 
 ### Mechanical existence check (secondary)
@@ -169,7 +168,7 @@ find . -name "*.md" \
   -not -path "./vendor/*" \
   -not -path "./.build/*" \
   -not -path "*/\.claude/*" \
-  -not -path "*/migration/*" 2>/dev/null | while read f; do
+  2>/dev/null | while read f; do
     base=$(basename "$f")
     # Skip non-framework files
     case "$base" in
@@ -194,7 +193,7 @@ Exclusions explained:
 - `.template.md` files ship embedded structure on purpose.
 - `SKILL.md` files often contain multi-line code-fenced examples of feature docs, including `## Success Criteria` headers inside the fences -- these are not actual feature docs and must not be misread as such.
 - `MEMORY.md` at repo root is a valid location for the project memory index; it is not a feature doc.
-- `migration/` at repo root holds staged project-specific content awaiting relocation and is excluded from compliance sweeps.
+- Files in directories explicitly excluded by the sweep (`.git`, `node_modules`, `vendor`, `.build`) are skipped.
 
 ### 3c: Compute migration targets
 
@@ -224,7 +223,7 @@ for f in .claude/rules/agent-placement.md .claude/rules/skill-placement.md .clau
 done
 ```
 
-A per-version migration catalog will replace this hardcoded list once `framework-versioning.feature.md` lands.
+A per-version migration catalog may replace this hardcoded list in a future framework version.
 
 ## Step 4: Ask only the questions content does not answer
 
@@ -290,7 +289,7 @@ Every proposed scaffolding change names the question it closes. Migrations are s
 
 ## Step 6: Create only what was approved (scaffolding)
 
-All creation is idempotent. Never overwrite existing files. For each approved change, load the relevant template from `~/.claude/skills/project-setup/templates/` and customize it as described below.
+All creation is idempotent. Never overwrite existing files. For each approved change, load the relevant template from the plugin's `global/skills/project-setup/templates/` directory and customize it as described below.
 
 ### 6a: Directories
 
@@ -300,7 +299,7 @@ mkdir -p .claude/rules .claude/agents .claude/hooks .claude/skills
 
 Only create `memory/` if the project does not already use `.claude/memory/` for the same purpose. Do not create `docs/features/` or `docs/flows/` -- feature and flow docs are colocated next to the code they describe.
 
-**Exception: the framework repo itself.** If `PROJECT_ROOT` is `claude-rails` (detectable via `basename $(pwd)` == `claude-rails` OR presence of top-level `.claude-plugin/plugin.json` + `memory-snippet.md` + `commands/`), skip `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/`. Claude-config **is** the global pool -- it has nothing to layer on top of itself. Only `.claude/rules/` is valid in claude-rails (it consumes its own rules templates during its own work sessions). This rule does NOT apply to any other repo.
+**Exception: the framework repo itself.** If `PROJECT_ROOT` contains a `.claude-plugin/plugin.json` with `"name": "claude-rails"`, skip `.claude/agents/`, `.claude/hooks/`, and `.claude/skills/`. Claude-rails IS the global pool -- it has nothing to layer on top of itself. Only `.claude/rules/` is valid in claude-rails. This rule does NOT apply to any other repo.
 
 ### 6b: Enforcement markers (only if missing)
 
@@ -313,7 +312,7 @@ Default is `warn`, not `block`. Never loosen an existing mode without asking.
 
 ### 6c: CLAUDE.md (create or reconcile)
 
-**If missing:** read `~/.claude/skills/project-setup/templates/claude-md.md` and customize the placeholders before writing:
+**If missing:** read `the plugin's `global/skills/project-setup/templates/claude-md.md` and customize the placeholders before writing:
 - `[Project Name]`: repo name from git
 - `[user's build command]`, `[user's test command]`: from Step 4 answers
 - `[actual path to issue tracker]`: from Q3 audit result
@@ -325,7 +324,7 @@ If Python detected: include the `## Python environment` section from the templat
 
 ### 6d: README.md with "Start here" and Troubleshooting runbook (only if missing)
 
-Read `~/.claude/skills/project-setup/templates/readme.md` and customize:
+Read `the plugin's `global/skills/project-setup/templates/readme.md` and customize:
 - `[Project Name]`: repo name
 - `[One-line description...]`: one sentence from CLAUDE.md or user input
 - `[actual path to issue tracker]`: from Q3 audit result
@@ -344,61 +343,59 @@ printf '<slug>' > .claude/current-feature
 
 Valid locations (in order of preference): `<root>/MEMORY.md`, `<root>/memory/MEMORY.md`, `<root>/.claude/memory/MEMORY.md`. Scaffold at `memory/MEMORY.md` by default. Only choose root-level if the repo's CLAUDE.md explicitly points at root MEMORY.md.
 
-Read `~/.claude/skills/project-setup/templates/memory.md` and customize:
+Read `the plugin's `global/skills/project-setup/templates/memory.md` and customize:
 - `[Project Name]`: repo name
 - `[path to issue tracker]`: from Q3 audit result
 
 ### 6g: Feature doc template
 
-Read `~/.claude/skills/project-setup/feature.template.md` (the canonical feature doc template). Store at `memory/FEATURE-TEMPLATE.md` (or `.claude/memory/FEATURE-TEMPLATE.md` if the repo uses that layout). Copy as-is -- the placeholders are meant for the project team to fill in when creating feature docs.
+Read the canonical feature doc template from the plugin's `global/skills/project-setup/templates/` directory. Store at `memory/FEATURE-TEMPLATE.md` (or `.claude/memory/FEATURE-TEMPLATE.md` if the repo uses that layout). Copy as-is -- the placeholders are meant for the project team to fill in when creating feature docs.
 
 ### 6h: Known issues tracker (only if Q3 was FAIL AND the repo has no existing tracker)
 
 If the repo already has a tracker at a non-standard path, do NOT create a parallel `memory/KNOWN-ISSUES.md`. Instead, close Q3 by pointing at the existing file from CLAUDE.md and README.
 
-If there is no tracker at all: read `~/.claude/skills/project-setup/templates/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is.
+If there is no tracker at all: read `the plugin's `global/skills/project-setup/templates/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is.
 
 ### 6i: Rules templates (in .claude/rules/, only if approved)
 
 Framework invariants (where agents/skills/hooks live across the two pools) are captured inline in the scaffolded CLAUDE.md (see Step 6c). Adopted repos do NOT get copies of `agent-placement.md`, `skill-placement.md`, or `hook-placement.md` -- those describe claude-rails's own discipline, not a per-project convention.
 
 **Domain rule templates** -- when approved, read the sidecar and write to `<project>/.claude/rules/<name>.md` (skip if destination already exists):
-- `error-ux.md`: read `~/.claude/skills/project-setup/templates/rules-error-ux.md`
-- `data-integrity.md`: read `~/.claude/skills/project-setup/templates/rules-data-integrity.md`
-- `test-placement.md`: read `~/.claude/skills/project-setup/templates/rules-test-placement.md`
+- `error-ux.md`: read `the plugin's `global/skills/project-setup/templates/rules-error-ux.md`
+- `data-integrity.md`: read `the plugin's `global/skills/project-setup/templates/rules-data-integrity.md`
+- `test-placement.md`: read `the plugin's `global/skills/project-setup/templates/rules-test-placement.md`
 
-**Universal rules** (always suggest; generate from `~/.claude/skills/project-setup/templates/rules-shape.md`):
+**Universal rules** (always suggest; generate from `the plugin's `global/skills/project-setup/templates/rules-shape.md`):
 - `feature-criteria.md` -- 5 litmus tests for valid success criteria (Rename, Outsider, Rewrite, Negation, Stability)
 - `flow-docs.md` -- one pipeline per doc; features reference flows, not the reverse
 
 **Stack-specific rules** (generate from `rules-shape.md`, sized ~20 lines each):
 - iOS/Swift: `codable-safety.md`, `metal-rendering.md`, `swiftui-state.md`
-- Python/FastAPI: `python-environment.md` (read `~/.claude/skills/project-setup/templates/rules-python-environment.md`), `models.md`, `routers.md`, `migrations.md`
+- Python/FastAPI: `python-environment.md` (read `the plugin's `global/skills/project-setup/templates/rules-python-environment.md`), `models.md`, `routers.md`, `migrations.md`
 - React/TypeScript: `components.md`, `state-management.md`, `api-layer.md`
 - Go: `interfaces.md`, `errors.md`, `concurrency.md`
 - Rust: `ownership.md`, `error-handling.md`, `modules.md`
 
 ### 6j: .claude/agents/ README
 
-Scaffold `.claude/agents/README.md` if missing. Read `~/.claude/skills/project-setup/templates/agents-readme.md` and write as-is. Do not scaffold any agent files.
+Scaffold `.claude/agents/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/agents-readme.md` and write as-is. Do not scaffold any agent files.
 
 ### 6k: .claude/hooks/ README
 
-Scaffold `.claude/hooks/README.md` if missing. Read `~/.claude/skills/project-setup/templates/hooks-readme.md` and write as-is. Do not scaffold any hook scripts.
+Scaffold `.claude/hooks/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/hooks-readme.md` and write as-is. Do not scaffold any hook scripts.
 
 ### 6l: .claude/skills/ README
 
-Scaffold `.claude/skills/README.md` if missing. Read `~/.claude/skills/project-setup/templates/skills-readme.md` and write as-is. Do not scaffold any skill files.
+Scaffold `.claude/skills/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/skills-readme.md` and write as-is. Do not scaffold any skill files.
 
 ### 6m: docs.export.yml (only if missing)
 
-If the repo has a `repo_url` (check `git remote get-url origin`): read `~/.claude/skills/project-setup/templates/docs-export.yml`, substitute `[Project Name]` and `[origin URL]`, and write to `docs.export.yml`. Leave `nav:` as a stub.
+If the repo has a `repo_url` (check `git remote get-url origin`): read `the plugin's `global/skills/project-setup/templates/docs-export.yml`, substitute `[Project Name]` and `[origin URL]`, and write to `docs.export.yml`. Leave `nav:` as a stub.
 
 ### 6n: Enforcement instructions (always reconcile)
 
-Enforcement is distributed via the `## Plugin Enforcement` section in CLAUDE.md (Step 6c). No per-project hook wiring or shell scripts are needed. The instructions are stored in the repo itself for portability -- the repo is self-contained.
-
-If the mechanical check (Step 2) shows `~/.claude/settings.local.json` does not wire the shell-based enforcement hooks, that is acceptable: Claude enforces the rules via the CLAUDE.md instructions. Point the user at the claude-rails README Quick Start only if they specifically want the shell hook hard-enforcement as a supplementary layer.
+Enforcement is distributed two ways: (1) the `## Plugin Enforcement` section in CLAUDE.md provides instruction-based enforcement, and (2) the claude-rails plugin's `hooks/hooks.json` provides prompt-type hooks that auto-wire on plugin load. Both layers work together. No per-project hook wiring or shell scripts are needed.
 
 ## Step 7: Execute migrations
 
@@ -426,7 +423,7 @@ Any remaining items mean a migration did not complete cleanly -- list them expli
 
 ## Step 9: Quick next steps
 
-Read `~/.claude/skills/project-setup/templates/quick-next-steps.md`. Substitute the real value of `.claude/feature-doc-mode` for `<enforcement-mode>`. Print the block.
+Read `the plugin's `global/skills/project-setup/templates/quick-next-steps.md`. Substitute the real value of `.claude/feature-doc-mode` for `<enforcement-mode>`. Print the block.
 
 ## Reminders
 
@@ -435,4 +432,4 @@ Read `~/.claude/skills/project-setup/templates/quick-next-steps.md`. Substitute 
 - If enforcement instructions are missing from CLAUDE.md: re-run `/project-setup` -- Step 6c reconciles them automatically.
 - If migrations were skipped (unresolved targets, unresolved duplicates): the user resolves manually and re-runs `/project-setup`. The skill is idempotent; unfinished work stays on the proposal list.
 - If project-specific hooks, skills, or agents already exist under `<project>/.claude/`: never overwrite them. The scaffolding only creates missing files.
-- If a template sidecar is missing from `~/.claude/skills/project-setup/templates/`: run `/sync-config` to restore it (sync junctions the global/skills/ directory into ~/.claude/skills/).
+- If a template is missing: ensure the claude-rails clone is intact and the plugin path is correct.

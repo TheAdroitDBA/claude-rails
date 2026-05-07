@@ -7,7 +7,7 @@ Copy this file into your project's `.claude/rules/` directory. Defines where tes
 - Tests live at `<project>/tests/<suite>/`. One directory per suite. A suite is a cohesive group of checks that verify one subject.
 - Every suite has a colocated `*.feature.md` with numbered Success Criteria, a `## Status` block, and a `### Progress` checklist.
 - **Tests are features.** A test suite is a unit of work owned like any other. No "just a quick test" exemption from the feature doc.
-- Suite filenames match the suite subject, not the thing being tested (`tests/shortcuts/shortcuts.sh`, not `tests/shortcuts/shorthand-expand.test.sh`).
+- Suite filenames match the suite subject, not the thing being tested (`tests/auth/auth.test.js`, not `tests/auth/login-handler.test.js`).
 - **No runner, assertion library, or framework is prescribed by this rule.** The project keeps its own established test tools. The rule governs layout and documentation, not execution.
 - **No network I/O. No git operations against the host repo.** Scratch git repos inside the OS temp dir are OK when simulating project context. **No persistent writes outside the repo**; ephemeral scratch state under `$TMPDIR` / `%TEMP%` is OK if the suite cleans it up on exit.
 - Cross-OS parity: if the subject runs on multiple OSes, the harness does too. Single-OS subjects can have a single-OS harness.

@@ -1,6 +1,6 @@
 # Project Agents
 
-This directory holds agents specific to this project. They coexist with global agents synced from `claude-rails/agents/` into `~/.claude/agents/`.
+This directory holds agents specific to this project. They coexist with global agents provided by the claude-rails plugin.
 
 ## Resolution
 
@@ -12,5 +12,5 @@ See `.claude/rules/agent-placement.md` for the authoritative placement model (li
 
 ## Framework-level agents (already global, do not copy here)
 
-- `ux-reviewer` -- invoked by `fs:` when a feature doc declares `## Surface`. Lives in `~/.claude/agents/`.
-- `qa-tester` -- invoked by `fs:` step 2 to check success criteria. May live globally or per-project depending on setup.
+- `ux-reviewer` -- invoked by `/fs` when a feature doc declares `## Surface`.
+- `qa-tester` -- invoked by `/fs` step 2 to check success criteria.

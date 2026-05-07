@@ -1,6 +1,6 @@
 # Feature Conventions
 
-Stack-agnostic principles every new feature in every claude-rails-synced
+Stack-agnostic principles every new feature in every claude-rails-adopted
 repo should follow. Loaded between `rules/` (invariants) and sibling
 docs in the token hierarchy so sessions see them before writing any
 feature doc.
@@ -158,11 +158,11 @@ explicitly:
 
 **Required format:** each bullet is `convention-name: one-line rationale`.
 The colon is load-bearing. A bullet without a colon has no rationale
-and is rejected by `fs:` at closure. "We'll add it later" is not a
+and is rejected by `/fs` at closure. "We'll add it later" is not a
 rationale; either address the convention now or state the genuine
 reason it does not apply.
 
-The `fs:` closure workflow surfaces each deviation in its commit
+The `/fs` closure workflow surfaces each deviation in its commit
 summary so reviewers see what was sidestepped without reading the
 whole feature doc.
 

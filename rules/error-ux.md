@@ -14,7 +14,7 @@ Copy this file into your project's `.claude/rules/` directory and customize the 
 
 - Before calling any function that could block the UI (network I/O, heavy computation, file I/O, GPU sync): evaluate whether it could exceed 16ms. If yes, show the indicator first, then dispatch the work.
 - Every catch block that surfaces an error to the user must map the internal error to a friendly message. Log the internal details to the error registry, show the friendly text to the user.
-- Review unresolved error registry entries as part of regular triage (e.g., the `w:` shorthand).
+- Review unresolved error registry entries as part of regular triage (e.g., the `/w` command).
 
 ## Common Mistakes
 
