@@ -69,7 +69,7 @@ Three enforcement hooks:
 
 All slash commands -- both workflow shortcuts and framework skills -- are native Claude Code commands. Source files live in `commands/` at the repo root. Workflow shortcuts: `/n`, `/f`, `/fs`, `/b`, `/bs`, `/t`, `/w`, `/r`, `/e`, `/i`. Framework skills: `/project-setup`, `/docs-audit`, `/discovery-check`, `/hook-health`, `/startup-audit`, `/troubleshoot`. Domain experts: `/software-architect`, `/security-expert`, `/testing-expert`, `/systems-expert`.
 
-Distribution: run `link-commands.sh` (Mac/Linux) or `link-commands.ps1` (Windows) once per machine. This symlinks/junctions `commands/` into `~/.claude/commands/`, making all shortcuts available globally. Edits to the repo are live immediately.
+Distribution: run `install.sh` (Mac/Linux) or `install.ps1` (Windows) once per machine. This symlinks/junctions `commands/` into `~/.claude/commands/` and registers the plugin in `~/.claude/settings.json`, making all shortcuts, hooks, and agents available globally. Edits to the repo are live immediately.
 
 ## Topic Files
 

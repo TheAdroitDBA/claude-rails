@@ -28,7 +28,7 @@ Claude-rails solves these problems with five mechanisms:
 
 ### Step 1: Clone the repo (one-time)
 
-Clone to wherever you keep repos on that machine. Substitute your actual path in all later steps.
+Clone to wherever you keep repos on that machine. Substitute your actual path in later steps.
 
 ```bash
 # Mac
@@ -43,46 +43,24 @@ git clone https://github.com/TheAdroitDBA/claude-rails.git /code/claude-rails
 git clone https://github.com/TheAdroitDBA/claude-rails.git C:\Code\claude-rails
 ```
 
-### Step 2: Link slash commands (one-time per machine)
+### Step 2: Install (one-time per machine)
 
-This creates a symlink/junction so `~/.claude/commands/` points at `claude-rails/commands/`. Edits to the repo are instantly live in every session -- no re-run needed.
+The install script links slash commands AND registers the plugin in `~/.claude/settings.json` -- one command does both.
 
 ```bash
 # Mac
-bash ~/claude-rails/link-commands.sh
+bash ~/claude-rails/install.sh
 
 # Linux
-bash /code/claude-rails/link-commands.sh
+bash /code/claude-rails/install.sh
 ```
 
 ```powershell
 # Windows PowerShell
-powershell -NoProfile -ExecutionPolicy Bypass -File C:\Code\claude-rails\link-commands.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\Code\claude-rails\install.ps1
 ```
 
-The script prints a verification summary listing every `/` command it found.
-
-### Step 3: Register the plugin (one-time)
-
-Add claude-rails as a local plugin source in your user settings so hooks and agents load automatically in every session. Add this to `~/.claude/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "claude-rails": {
-      "source": {
-        "source": "directory",
-        "path": "/path/to/claude-rails"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "claude-rails@claude-rails": true
-  }
-}
-```
-
-Replace `/path/to/claude-rails` with your actual clone path (e.g. `~/claude-rails` on Mac, `/code/claude-rails` on Linux, `C:\\Code\\claude-rails` on Windows -- note the double backslashes in JSON).
+The script is idempotent (safe to re-run) and prints a verification summary: junction status, plugin registration, discovered commands, and hooks file presence.
 
 **Testing only**: to try the plugin without committing it to your settings, pass `--plugin-dir` on a single launch:
 
@@ -92,7 +70,7 @@ claude --plugin-dir ~/claude-rails
 
 This is useful for testing a branch or validating a change before updating settings.
 
-### Step 4: Verify
+### Step 3: Verify
 
 Start Claude Code in any repo and confirm:
 
@@ -100,7 +78,7 @@ Start Claude Code in any repo and confirm:
 - `/project-setup` is available (commands are linked)
 - `/software-architect` is available (domain-expert commands are linked)
 
-If `/w`, `/project-setup`, or `/software-architect` fail, check that Step 2 completed (symlink exists at `~/.claude/commands/`). If enforcement hooks are not firing, check that Step 3 points at the correct plugin path.
+If any of the above fail, re-run the install script or run `/hook-health` from within Claude Code -- it will diagnose and offer to fix broken setup.
 
 ## Setting Up a New Repo
 
@@ -213,6 +191,6 @@ claude-rails/
   global/                    Global pool: discovered by the plugin
     agents/                  Global agents
     hooks/                   hook-lifecycle.flow.md (hook definitions in .claude-plugin/hooks/hooks.json)
-  link-commands.sh           One-time symlink setup (Mac/Linux)
-  link-commands.ps1          One-time junction setup (Windows)
+  install.sh                 One-time install: links commands + registers plugin (Mac/Linux)
+  install.ps1                One-time install: links commands + registers plugin (Windows)
 ```

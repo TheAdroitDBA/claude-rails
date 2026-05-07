@@ -7,8 +7,8 @@ Canonical vocabulary for the claude-rails framework. Use these terms precisely i
 | Term | Definition |
 |------|-----------|
 | **framework** | The whole claude-rails pattern: plugin manifest, hooks, feature-doc conventions, enforcement rules, skills, agents, and slash commands. |
-| **plugin install** | Registering claude-rails in `~/.claude/settings.json` or running Claude Code with `--plugin-dir /path/to/claude-rails`. Loads global-pool agents and hooks for the session. Skills are delivered as commands via the `link-commands` junction, not via the plugin. |
-| **commands link** | The one-time symlink/junction created by `link-commands.sh` (Mac/Linux) or `link-commands.ps1` (Windows) that makes `~/.claude/commands/` point at `claude-rails/commands/`. |
+| **plugin install** | Running `install.sh` (Mac/Linux) or `install.ps1` (Windows), which registers claude-rails in `~/.claude/settings.json` and links commands in one step. Loads global-pool agents and hooks for the session. Skills are delivered as commands via the install-script junction, not via the plugin. |
+| **commands link** | The symlink/junction created by the install script that makes `~/.claude/commands/` point at `claude-rails/commands/`. |
 
 ## Units of Work
 

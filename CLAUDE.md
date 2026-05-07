@@ -10,12 +10,20 @@ ALWAYS read MEMORY.md first. It is the single canonical description of the frame
 
 ## Build & Test
 
-No compiled build. Distribution is via Claude Code's native plugin system: register in `~/.claude/settings.json` (one-time). Pass `claude --plugin-dir /path/to/claude-rails` only for testing without committing to settings. See README.md Quick Start. Slash commands are wired via `link-commands.sh` / `link-commands.ps1` (one-time per machine). Edits to the repo are live immediately.
+No compiled build. Run `install.sh` (Mac/Linux) or `install.ps1` (Windows) from this directory -- it links commands and registers the plugin in one step. Pass `claude --plugin-dir /path/to/claude-rails` only for testing without committing to settings. Edits to the repo are live immediately.
+
+## Framework Health
+
+If slash commands are not responding or enforcement hooks are not firing, diagnose and fix:
+
+1. Commands: verify `~/.claude/commands/` points at this repo's `commands/`. If not, run the install script or create the junction manually.
+2. Plugin: verify `~/.claude/settings.json` has `claude-rails` in `extraKnownMarketplaces`. If not, read the file, add the registration keys, and write it back.
+3. Per-repo enforcement: verify `.claude/feature-doc-required` exists in the target repo. If absent, enforcement is inactive by design -- run `/project-setup` to opt in.
 
 ## Conventions
 
 - Plain-text .md only (no emojis).
-- Framework skills and domain-expert commands live in `commands/`, delivered via the `link-commands` junction. Global-pool hooks live under global/hooks/; agents under global/agents/. The plugin delivers hooks and agents; commands are available in every session via the junction.
+- Framework skills and domain-expert commands live in `commands/`, delivered via the install-script junction. Global-pool hooks live under global/hooks/; agents under global/agents/. The plugin delivers hooks and agents; commands are available in every session via the junction.
 
 ## Do Not
 
