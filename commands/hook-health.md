@@ -1,21 +1,20 @@
 ---
-name: hook-health
-description: Verifies claude-rails enforcement hooks are active. Checks that the plugin is loaded, hooks/hooks.json exists, and enforcement markers are correctly placed in the current repo. Read-only.
+description: Verifies claude-rails enforcement hooks are active. Checks that commands are discoverable, hooks/hooks.json exists, and enforcement markers are correctly placed in the current repo. Read-only.
 ---
 
 # Hook Health
 
-You are verifying that claude-rails's enforcement hooks are active in the current session. The user invokes this skill when they are unsure whether enforcement is working -- e.g. after registering the plugin, switching machines, or adopting a new repo.
+You are verifying that claude-rails's enforcement hooks are active in the current session. The user invokes this command when they are unsure whether enforcement is working -- e.g. after registering the plugin, switching machines, or adopting a new repo.
 
-This skill is **read-only**. Never write or modify any file. Remediation is advisory.
+This command is **read-only**. Never write or modify any file. Remediation is advisory.
 
-## Step 1: Verify plugin is loaded
+## Step 1: Verify commands are discoverable
 
-Check whether claude-rails skills are discoverable in this session. If `/project-setup` or `/software-architect` are not available, the plugin is not loaded.
+Check whether claude-rails commands are discoverable in this session. If `/project-setup` or `/software-architect` are not available, the commands are not linked.
 
 Report:
-- PASS: plugin is loaded (skills are discoverable)
-- FAIL: plugin not loaded. Remediation: register claude-rails in `~/.claude/settings.json` (see README Quick Start step 3) or launch with `--plugin-dir`.
+- PASS: commands are discoverable
+- FAIL: commands not linked. Remediation: run `link-commands.sh` (Mac/Linux) or `link-commands.ps1` (Windows) from the claude-rails directory. See README Quick Start step 2.
 
 ## Step 2: Verify hooks.json exists
 
@@ -59,7 +58,7 @@ Emit a single Markdown report:
 
 | Check | Status | Detail |
 |-------|--------|--------|
-| Plugin loaded | PASS/FAIL | ... |
+| Commands linked | PASS/FAIL | ... |
 | hooks.json present | PASS/FAIL | ... |
 | Enforcement markers | ACTIVE/INACTIVE/OFF | mode: block/warn/off |
 
@@ -77,9 +76,9 @@ Emit a single Markdown report:
 ```
 
 Closing lines:
-- Plugin loaded + markers active: `Enforcement is active. Edits to uncovered files will be blocked/warned.`
-- Plugin loaded + no markers: `Plugin is loaded but this repo has not opted into enforcement. Run /project-setup to set up markers.`
-- Plugin not loaded: `Plugin is not loaded. Register it in ~/.claude/settings.json or use --plugin-dir.`
+- Commands linked + markers active: `Enforcement is active. Edits to uncovered files will be blocked/warned.`
+- Commands linked + no markers: `Commands are linked but this repo has not opted into enforcement. Run /project-setup to set up markers.`
+- Commands not linked: `Commands are not linked. Run link-commands.sh or link-commands.ps1 from the claude-rails directory.`
 
 ## Do not
 

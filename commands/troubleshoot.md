@@ -1,5 +1,4 @@
 ---
-name: troubleshoot
 description: Expert error troubleshooting skill. Always moves forward. Never repeats failed attempts.
 ---
 

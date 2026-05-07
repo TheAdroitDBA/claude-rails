@@ -1,5 +1,4 @@
 ---
-name: project-setup
 description: Set up or audit a project's Claude Code enforcement structure (CLAUDE.md, hooks, skills, agents, rules, feature docs). Actively migrates legacy docs/features/ and docs/flows/ into colocated positions. Idempotent -- safe to re-run on new or existing projects.
 ---
 
@@ -19,7 +18,7 @@ A file that exists but is not discoverable from the repo root does not count. A 
 
 On top of the orientation audit, this skill **actively migrates** legacy `docs/features/` and `docs/flows/` layouts into the colocated convention (`*.feature.md` / `*.flow.md` next to code). It also **sweeps** for misplaced framework docs (files that look like feature or flow docs but sit in wrong locations) and proposes moves. All migrations preserve git history via `git mv`; nothing is deleted.
 
-The full pipeline is documented in `global/skills/project-setup/project-setup.flow.md`. The steps below are the procedural form of that pipeline.
+The steps below are the procedural form of that pipeline.
 
 ## Do not
 
@@ -289,7 +288,7 @@ Every proposed scaffolding change names the question it closes. Migrations are s
 
 ## Step 6: Create only what was approved (scaffolding)
 
-All creation is idempotent. Never overwrite existing files. For each approved change, load the relevant template from the plugin's `global/skills/project-setup/templates/` directory and customize it as described below.
+All creation is idempotent. Never overwrite existing files. For each approved change, load the relevant template from the framework's `templates/project-setup/` directory and customize it as described below.
 
 ### 6a: Directories
 
@@ -312,7 +311,7 @@ Default is `warn`, not `block`. Never loosen an existing mode without asking.
 
 ### 6c: CLAUDE.md (create or reconcile)
 
-**If missing:** read `the plugin's `global/skills/project-setup/templates/claude-md.md` and customize the placeholders before writing:
+**If missing:** read the framework's `templates/project-setup/claude-md.md` and customize the placeholders before writing:
 - `[Project Name]`: repo name from git
 - `[user's build command]`, `[user's test command]`: from Step 4 answers
 - `[actual path to issue tracker]`: from Q3 audit result
@@ -324,7 +323,7 @@ If Python detected: include the `## Python environment` section from the templat
 
 ### 6d: README.md with "Start here" and Troubleshooting runbook (only if missing)
 
-Read `the plugin's `global/skills/project-setup/templates/readme.md` and customize:
+Read the framework's `templates/project-setup/readme.md` and customize:
 - `[Project Name]`: repo name
 - `[One-line description...]`: one sentence from CLAUDE.md or user input
 - `[actual path to issue tracker]`: from Q3 audit result
@@ -343,55 +342,55 @@ printf '<slug>' > .claude/current-feature
 
 Valid locations (in order of preference): `<root>/MEMORY.md`, `<root>/memory/MEMORY.md`, `<root>/.claude/memory/MEMORY.md`. Scaffold at `memory/MEMORY.md` by default. Only choose root-level if the repo's CLAUDE.md explicitly points at root MEMORY.md.
 
-Read `the plugin's `global/skills/project-setup/templates/memory.md` and customize:
+Read the framework's `templates/project-setup/memory.md` and customize:
 - `[Project Name]`: repo name
 - `[path to issue tracker]`: from Q3 audit result
 
 ### 6g: Feature doc template
 
-Read the canonical feature doc template from the plugin's `global/skills/project-setup/templates/` directory. Store at `memory/FEATURE-TEMPLATE.md` (or `.claude/memory/FEATURE-TEMPLATE.md` if the repo uses that layout). Copy as-is -- the placeholders are meant for the project team to fill in when creating feature docs.
+Read the canonical feature doc template from the framework's `templates/project-setup/` directory. Store at `memory/FEATURE-TEMPLATE.md` (or `.claude/memory/FEATURE-TEMPLATE.md` if the repo uses that layout). Copy as-is -- the placeholders are meant for the project team to fill in when creating feature docs.
 
 ### 6h: Known issues tracker (only if Q3 was FAIL AND the repo has no existing tracker)
 
 If the repo already has a tracker at a non-standard path, do NOT create a parallel `memory/KNOWN-ISSUES.md`. Instead, close Q3 by pointing at the existing file from CLAUDE.md and README.
 
-If there is no tracker at all: read `the plugin's `global/skills/project-setup/templates/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is.
+If there is no tracker at all: read the framework's `templates/project-setup/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is.
 
 ### 6i: Rules templates (in .claude/rules/, only if approved)
 
 Framework invariants (where agents/skills/hooks live across the two pools) are captured inline in the scaffolded CLAUDE.md (see Step 6c). Adopted repos do NOT get copies of `agent-placement.md`, `skill-placement.md`, or `hook-placement.md` -- those describe claude-rails's own discipline, not a per-project convention.
 
 **Domain rule templates** -- when approved, read the sidecar and write to `<project>/.claude/rules/<name>.md` (skip if destination already exists):
-- `error-ux.md`: read `the plugin's `global/skills/project-setup/templates/rules-error-ux.md`
-- `data-integrity.md`: read `the plugin's `global/skills/project-setup/templates/rules-data-integrity.md`
-- `test-placement.md`: read `the plugin's `global/skills/project-setup/templates/rules-test-placement.md`
+- `error-ux.md`: read the framework's `templates/project-setup/rules-error-ux.md`
+- `data-integrity.md`: read the framework's `templates/project-setup/rules-data-integrity.md`
+- `test-placement.md`: read the framework's `templates/project-setup/rules-test-placement.md`
 
-**Universal rules** (always suggest; generate from `the plugin's `global/skills/project-setup/templates/rules-shape.md`):
+**Universal rules** (always suggest; generate from the framework's `templates/project-setup/rules-shape.md`):
 - `feature-criteria.md` -- 5 litmus tests for valid success criteria (Rename, Outsider, Rewrite, Negation, Stability)
 - `flow-docs.md` -- one pipeline per doc; features reference flows, not the reverse
 
 **Stack-specific rules** (generate from `rules-shape.md`, sized ~20 lines each):
 - iOS/Swift: `codable-safety.md`, `metal-rendering.md`, `swiftui-state.md`
-- Python/FastAPI: `python-environment.md` (read `the plugin's `global/skills/project-setup/templates/rules-python-environment.md`), `models.md`, `routers.md`, `migrations.md`
+- Python/FastAPI: `python-environment.md` (read the framework's `templates/project-setup/rules-python-environment.md`), `models.md`, `routers.md`, `migrations.md`
 - React/TypeScript: `components.md`, `state-management.md`, `api-layer.md`
 - Go: `interfaces.md`, `errors.md`, `concurrency.md`
 - Rust: `ownership.md`, `error-handling.md`, `modules.md`
 
 ### 6j: .claude/agents/ README
 
-Scaffold `.claude/agents/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/agents-readme.md` and write as-is. Do not scaffold any agent files.
+Scaffold `.claude/agents/README.md` if missing. Read the framework's `templates/project-setup/agents-readme.md` and write as-is. Do not scaffold any agent files.
 
 ### 6k: .claude/hooks/ README
 
-Scaffold `.claude/hooks/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/hooks-readme.md` and write as-is. Do not scaffold any hook scripts.
+Scaffold `.claude/hooks/README.md` if missing. Read the framework's `templates/project-setup/hooks-readme.md` and write as-is. Do not scaffold any hook scripts.
 
 ### 6l: .claude/skills/ README
 
-Scaffold `.claude/skills/README.md` if missing. Read `the plugin's `global/skills/project-setup/templates/skills-readme.md` and write as-is. Do not scaffold any skill files.
+Scaffold `.claude/skills/README.md` if missing. Read the framework's `templates/project-setup/skills-readme.md` and write as-is. Do not scaffold any skill files.
 
 ### 6m: docs.export.yml (only if missing)
 
-If the repo has a `repo_url` (check `git remote get-url origin`): read `the plugin's `global/skills/project-setup/templates/docs-export.yml`, substitute `[Project Name]` and `[origin URL]`, and write to `docs.export.yml`. Leave `nav:` as a stub.
+If the repo has a `repo_url` (check `git remote get-url origin`): read the framework's `templates/project-setup/docs-export.yml`, substitute `[Project Name]` and `[origin URL]`, and write to `docs.export.yml`. Leave `nav:` as a stub.
 
 ### 6n: Enforcement instructions (always reconcile)
 
@@ -423,7 +422,7 @@ Any remaining items mean a migration did not complete cleanly -- list them expli
 
 ## Step 9: Quick next steps
 
-Read `the plugin's `global/skills/project-setup/templates/quick-next-steps.md`. Substitute the real value of `.claude/feature-doc-mode` for `<enforcement-mode>`. Print the block.
+Read the framework's `templates/project-setup/quick-next-steps.md`. Substitute the real value of `.claude/feature-doc-mode` for `<enforcement-mode>`. Print the block.
 
 ## Reminders
 

@@ -4,7 +4,7 @@ Copy this file into your project's `.claude/rules/` directory. Defines where ski
 
 ## Invariants
 
-- Two pools exist: the **global pool** (shipped via the claude-rails plugin, lives in `claude-rails/global/skills/`) and the **project-local pool** at `<project>/.claude/skills/`. Both are visible when Claude Code runs inside a project; the project pool shadows the global pool by skill name.
+- Two pools exist: the **global pool** (shipped via claude-rails, lives in `claude-rails/commands/`) and the **project-local pool** at `<project>/.claude/skills/`. Both are visible when Claude Code runs inside a project; the project pool shadows the global pool by skill name.
 - Global skills are one of two kinds: **framework-level** (universal workflows like `project-setup`, `docs-audit`, `troubleshoot`, `startup-audit`) or **domain-expert** (portable knowledge like `software-architect`, `security-expert`, `testing-expert`). Both kinds MUST work on any project without modification.
 - Project skills are coupled to one project. They reference that project's databases, hostnames, file paths, conventions, deployment targets.
 - **Prefix convention:** project skills use a `<project-slug>-<skill-name>/` directory name. Global skills have no prefix.

@@ -17,7 +17,7 @@ Claude-rails solves these problems with five mechanisms:
 - **Token hierarchy** -- a strict read order (rules -> sibling docs -> memory -> source) keeps Claude out of source code until necessary.
 - **Enforcement hooks** -- opt-in hooks block edits to code that has no feature doc, forcing "what does correct look like?" before every change.
 - **Slash commands** -- single-character shortcuts (`/n`, `/f`, `/b`, `/t`, `/w`) prevent re-explaining workflows every session.
-- **Domain-expert skills** -- portable architectural guidance (software architecture, security, testing, infrastructure) available in every session regardless of which repo you are in.
+- **Domain-expert commands** -- portable architectural guidance (software architecture, security, testing, infrastructure) available in every session regardless of which repo you are in.
 
 ## Quick Start
 
@@ -64,7 +64,7 @@ The script prints a verification summary listing every `/` command it found.
 
 ### Step 3: Register the plugin (one-time)
 
-Add claude-rails as a local plugin source in your user settings so it loads automatically in every session. Add this to `~/.claude/settings.json`:
+Add claude-rails as a local plugin source in your user settings so hooks and agents load automatically in every session. Add this to `~/.claude/settings.json`:
 
 ```json
 {
@@ -97,10 +97,10 @@ This is useful for testing a branch or validating a change before updating setti
 Start Claude Code in any repo and confirm:
 
 - `/w` responds (slash commands are linked)
-- `/project-setup` is available (plugin is loaded)
-- `/software-architect` is available (domain-expert skills are discovered)
+- `/project-setup` is available (commands are linked)
+- `/software-architect` is available (domain-expert commands are linked)
 
-If any of these fail, check that Step 2 completed (symlink exists at `~/.claude/commands/`) and that Step 3 points at the correct path.
+If `/w`, `/project-setup`, or `/software-architect` fail, check that Step 2 completed (symlink exists at `~/.claude/commands/`). If enforcement hooks are not firing, check that Step 3 points at the correct plugin path.
 
 ## Setting Up a New Repo
 
@@ -159,10 +159,10 @@ The hooks are globally active but only enforce in repos that have opted in. When
 | `/e` | Fetch and display unresolved errors from the project's error source |
 | `/i` | Capture an idea before it is lost |
 
-### Framework Skills
+### Framework Commands
 
-| Skill | Purpose |
-|-------|---------|
+| Command | Purpose |
+|---------|---------|
 | `/project-setup` | Scaffold or audit a repo's Claude Code structure |
 | `/docs-audit` | Audit docs for staleness, duplication, broken references |
 | `/discovery-check` | Verify a repo's orientation cost is under budget |
@@ -170,10 +170,10 @@ The hooks are globally active but only enforce in repos that have opted in. When
 | `/hook-health` | Verify enforcement hooks are wired correctly |
 | `/troubleshoot` | Expert error troubleshooting |
 
-### Domain-Expert Skills
+### Domain-Expert Commands
 
-| Skill | Purpose |
-|-------|---------|
+| Command | Purpose |
+|---------|---------|
 | `/software-architect` | Clean Architecture, SOLID, dependency direction, API contracts |
 | `/security-expert` | Data classification, auth patterns, OWASP, secrets management |
 | `/testing-expert` | Test pyramid, mock discipline, coverage philosophy |
@@ -202,14 +202,15 @@ The hooks are globally active but only enforce in repos that have opted in. When
 
 ```
 claude-rails/
-  .claude-plugin/             Plugin manifest (loaded via --plugin-dir)
+  .claude-plugin/             Plugin manifest (hooks + agents only)
     plugin.json
-  commands/                   Slash command source files (linked to ~/.claude/commands)
+  commands/                   All slash commands: workflow shortcuts + framework skills + domain experts
   conventions/                Stack-agnostic principles
   decisions/                  Architecture decision records
   rules/                     Framework invariant rules (claude-rails' own discipline)
+  templates/                 Templates used by /project-setup scaffolding
+    project-setup/           CLAUDE.md, README, rules, memory templates
   global/                    Global pool: discovered by the plugin
-    skills/                  Framework + domain-expert skills
     agents/                  Global agents
     hooks/                   hook-lifecycle.flow.md (hook definitions in .claude-plugin/hooks/hooks.json)
   link-commands.sh           One-time symlink setup (Mac/Linux)

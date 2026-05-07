@@ -22,7 +22,7 @@ Global-pool skills must discover project context at invocation time rather than 
 - Every global-pool skill can run in any adopted repo without modification.
 - Discovery calls add per-invocation overhead (one `git rev-parse`, one CLAUDE.md read). Negligible in practice.
 - When an adopted repo has not declared the state a skill needs, the skill fails with a helpful error rather than silently operating on the wrong path. This is the intended behavior: a broken discovery call is a signal to run `/project-setup`, not a bug in the skill.
-- This rule is enforceable by grep on `global/skills/**` for known anti-patterns (absolute user paths, project-name strings, hardcoded IPs).
+- This rule is enforceable by grep on `commands/` for known anti-patterns (absolute user paths, project-name strings, hardcoded IPs).
 - Adding a new global-pool skill now carries a visible obligation: if the skill hardcodes, it gets rejected or demoted at review time. The rule is declarative, so the review bar is clear.
 
 ## Alternatives Considered
@@ -34,4 +34,4 @@ Global-pool skills must discover project context at invocation time rather than 
 ## Affected Features
 
 - rules/skill-placement.md (references this decision for the "how" of project-neutrality)
-- global/skills/project-setup/SKILL.md (scaffolds adopted repos so skills can discover context)
+- commands/project-setup.md (scaffolds adopted repos so skills can discover context)

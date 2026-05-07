@@ -7,15 +7,15 @@ Canonical vocabulary for the claude-rails framework. Use these terms precisely i
 | Term | Definition |
 |------|-----------|
 | **framework** | The whole claude-rails pattern: plugin manifest, hooks, feature-doc conventions, enforcement rules, skills, agents, and slash commands. |
-| **plugin install** | Registering claude-rails in `~/.claude/settings.json` or running Claude Code with `--plugin-dir /path/to/claude-rails`. Loads global-pool skills, agents, and hooks for the session. |
+| **plugin install** | Registering claude-rails in `~/.claude/settings.json` or running Claude Code with `--plugin-dir /path/to/claude-rails`. Loads global-pool agents and hooks for the session. Skills are delivered as commands via the `link-commands` junction, not via the plugin. |
 | **commands link** | The one-time symlink/junction created by `link-commands.sh` (Mac/Linux) or `link-commands.ps1` (Windows) that makes `~/.claude/commands/` point at `claude-rails/commands/`. |
 
 ## Units of Work
 
 | Term | Definition |
 |------|-----------|
-| **skill** | A custom slash command defined by a `SKILL.md` file in a skill directory. Invoked in chat as `/<skill-name>`. Lives under `global/skills/<name>/` for framework skills or `.claude/skills/<name>/` for project-specific skills. |
-| **slash command** | The invocation form (`/<name>`) of a skill or command. Source files live in `commands/` (for short workflow commands) or `global/skills/<name>/SKILL.md` (for full skills). |
+| **skill** | A slash command providing domain expertise or framework functionality. Invoked in chat as `/<skill-name>`. Framework skills live in `commands/` alongside workflow shortcuts. Project-specific skills live in `.claude/skills/<name>/` within the project repo. |
+| **slash command** | The invocation form (`/<name>`) of a command. All source files -- both workflow shortcuts and framework skills -- live in `commands/`. |
 | **agent** | A specialized Claude persona defined by a markdown file. Lives under `global/agents/` for framework agents or `.claude/agents/` for project-specific agents. |
 | **hook** | A rule that fires automatically on a Claude Code event. Defined in `hooks/hooks.json` within the plugin. Uses prompt-type handlers (Claude evaluates enforcement logic directly). |
 | **hook event** | The Claude Code lifecycle point where a hook fires: `PreToolUse` (before a tool runs), `PostToolUse` (after a tool runs), `Stop` (when the session ends). |

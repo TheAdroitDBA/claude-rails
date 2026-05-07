@@ -12,7 +12,7 @@ Some skills, agents, and hooks are universally useful -- every project benefits 
 
 Every unit of work (skill, agent, hook) lives in exactly one of two pools:
 
-- **Global pool** (shipped via the claude-rails plugin) -- framework-scoped, available in every session that loads the plugin. Contents must be project-neutral: no hardcoded IPs, hostnames, or deployment targets for any specific project. Skills and agents live in `claude-rails/global/{skills,agents}/`. Hooks live in `claude-rails/.claude-plugin/hooks/hooks.json`.
+- **Global pool** (shipped via claude-rails) -- framework-scoped, available in every session that loads the plugin. Contents must be project-neutral: no hardcoded IPs, hostnames, or deployment targets for any specific project. Skills are delivered as commands in `claude-rails/commands/` (via the `link-commands` junction). Agents live in `claude-rails/global/agents/` (via the plugin). Hooks live in `claude-rails/.claude-plugin/hooks/hooks.json`.
 - **Project pool** (`<project>/.claude/{skills,agents}/` and `<project>/.claude/settings.json` for hooks) -- project-scoped, lives in the project repo. May reference project-specific targets freely.
 
 The litmus test: if the artifact references a specific IP, hostname, or deployment target that only exists in one project, it belongs to that project's pool. Otherwise it belongs to the global pool.

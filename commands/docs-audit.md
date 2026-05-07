@@ -1,5 +1,4 @@
 ---
-name: docs-audit
 description: Audit all project documentation for staleness, duplication, orphaned files, broken references, and sprawl. Works across any project. Recommends delete/merge/move/update actions and asks before acting.
 ---
 

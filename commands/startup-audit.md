@@ -1,5 +1,4 @@
 ---
-name: startup-audit
 description: Comprehensive startup performance audit for any application. Identifies duplicate work, unnecessary delays, ordering issues, and optimization opportunities.
 ---
 

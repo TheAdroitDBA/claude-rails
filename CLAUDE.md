@@ -15,7 +15,7 @@ No compiled build. Distribution is via Claude Code's native plugin system: regis
 ## Conventions
 
 - Plain-text .md only (no emojis).
-- All global-pool skills live under global/skills/. Global-pool hooks live under global/hooks/; agents under global/agents/. The plugin system makes them available in every session that loads claude-rails.
+- Framework skills and domain-expert commands live in `commands/`, delivered via the `link-commands` junction. Global-pool hooks live under global/hooks/; agents under global/agents/. The plugin delivers hooks and agents; commands are available in every session via the junction.
 
 ## Do Not
 

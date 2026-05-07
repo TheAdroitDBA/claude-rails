@@ -30,4 +30,4 @@ Tests live in `tests/<suite>/` at the repo root. Each suite is a directory conta
 
 - rules/test-placement.md
 - MEMORY.md (Rules Templates section listing test-placement.md as opinionated template)
-- global/skills/project-setup/SKILL.md (scaffolds tests/ into new repos)
+- commands/project-setup.md (scaffolds tests/ into new repos)
