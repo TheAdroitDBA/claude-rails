@@ -1,5 +1,58 @@
 # install.ps1 -- link commands and register the plugin in one step
 # Idempotent: safe to re-run. Backs up any existing real directory first.
+#
+# Requires PowerShell 7+. If invoked under Windows PowerShell 5.1, this
+# bootstrap auto-installs pwsh via winget and relaunches the script.
+
+# -- Bootstrap: ensure PowerShell 7+ ----------------------------------------
+# This block is intentionally written to be 5.1-compatible (no ternary, no
+# null-coalescing, no -AsHashtable, no pipeline chain operators).
+
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
+    if ($pwshCmd) {
+        $pwshExe = $pwshCmd.Source
+    } else {
+        $pwshExe = $null
+    }
+
+    if (-not $pwshExe) {
+        Write-Host "PowerShell 7+ not found. Installing via winget..."
+
+        $wingetCmd = Get-Command winget -ErrorAction SilentlyContinue
+        if (-not $wingetCmd) {
+            Write-Error "PowerShell 7+ is required, and winget is not available to install it. Install pwsh manually from https://aka.ms/powershell and re-run this script."
+            exit 1
+        }
+
+        winget install --id Microsoft.PowerShell --silent --accept-source-agreements --accept-package-agreements
+        $wingetExit = $LASTEXITCODE
+
+        # winget does not refresh PATH in the current session; probe the
+        # default install location before falling back to Get-Command.
+        $candidate = Join-Path $env:ProgramFiles "PowerShell\7\pwsh.exe"
+        if (Test-Path $candidate) {
+            $pwshExe = $candidate
+        } else {
+            $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
+            if ($pwshCmd) { $pwshExe = $pwshCmd.Source }
+        }
+
+        if (-not $pwshExe) {
+            Write-Error "winget install finished (exit code $wingetExit) but pwsh.exe was not found. Install PowerShell 7+ manually from https://aka.ms/powershell, then re-run this script."
+            exit 1
+        }
+
+        Write-Host "PowerShell 7+ installed at $pwshExe"
+    }
+
+    Write-Host "Relaunching under pwsh..."
+    & $pwshExe -NoProfile -ExecutionPolicy Bypass -File $PSCommandPath @args
+    exit $LASTEXITCODE
+}
+
+# From here on we are guaranteed PowerShell 7+, so 7-only features
+# (ConvertFrom-Json -AsHashtable, ternary, null-coalescing) are safe.
 
 $RepoDir      = Split-Path -Parent $MyInvocation.MyCommand.Path
 $CommandsSrc  = Join-Path $RepoDir "commands"
