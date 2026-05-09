@@ -145,6 +145,22 @@ else
   fi
 fi
 
+# -- Step 2.5: Stamp installed version --------------------------------------
+# Writes the current claude-rails VERSION to a known location. Adopting repos
+# read this to record the framework version they were last validated against.
+# Consumed by /check-conformance and the session-start banner.
+
+VERSION_FILE="$REPO_DIR/VERSION"
+VERSION_STAMP="$HOME/.claude/claude-rails-version"
+
+if [ -f "$VERSION_FILE" ]; then
+  CURRENT_VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
+  printf '%s\n' "$CURRENT_VERSION" > "$VERSION_STAMP"
+  echo "Version:  $CURRENT_VERSION (stamped to $VERSION_STAMP)"
+else
+  echo "WARNING:  $VERSION_FILE not found; version stamp not written."
+fi
+
 # -- Step 3: Verification ----------------------------------------------------
 
 echo ""
@@ -165,4 +181,7 @@ if [ -f "$REPO_DIR/.claude-plugin/hooks/hooks.json" ]; then
   echo "                (exists)"
 else
   echo "                (NOT FOUND -- plugin may not fire hooks)"
+fi
+if [ -f "$VERSION_STAMP" ]; then
+  echo "  Version     : $(cat "$VERSION_STAMP") (from $VERSION_STAMP)"
 fi

@@ -156,6 +156,10 @@ The hooks are globally active but only enforce in repos that have opted in. When
 | `/security-expert` | Data classification, auth patterns, OWASP, secrets management |
 | `/testing-expert` | Test pyramid, mock discipline, coverage philosophy |
 | `/systems-expert` | Deployment, CI/CD, networking, monitoring, backups |
+| `/documentation-expert` | Diátaxis, doc-as-code, single-source-of-truth, content design, audit/freshness |
+| `/data-expert` | Schema design, indexing, query optimization, migrations, transactions, lifecycle |
+| `/observability-expert` | Telemetry, SLIs/SLOs, alerting, log structure, metric design, dashboards |
+| `/release-management-expert` | Versioning, changelogs, deprecation, breaking-change handling, cross-repo coordination |
 
 ### Agents
 

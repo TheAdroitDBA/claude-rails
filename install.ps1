@@ -161,6 +161,22 @@ if ($needsUpdate) {
     Write-Host "Plugin:   registered in $SettingsFile"
 }
 
+# -- Step 2.5: Stamp installed version --------------------------------------
+# Writes the current claude-rails VERSION to a known location. Adopting repos
+# read this to record the framework version they were last validated against.
+# Consumed by /check-conformance and the session-start banner.
+
+$VersionFile  = Join-Path $RepoDir "VERSION"
+$VersionStamp = Join-Path $env:USERPROFILE ".claude\claude-rails-version"
+
+if (Test-Path $VersionFile) {
+    $CurrentVersion = (Get-Content $VersionFile -Raw).Trim()
+    Set-Content -Path $VersionStamp -Value $CurrentVersion -Encoding UTF8 -NoNewline
+    Write-Host "Version:  $CurrentVersion (stamped to $VersionStamp)"
+} else {
+    Write-Host "WARNING:  $VersionFile not found; version stamp not written."
+}
+
 # -- Step 3: Verification ----------------------------------------------------
 
 Write-Host ""
@@ -186,4 +202,9 @@ if (Test-Path $hooksFile) {
     Write-Host "                (exists)"
 } else {
     Write-Host "                (NOT FOUND -- plugin may not fire hooks)"
+}
+
+if (Test-Path $VersionStamp) {
+    $stamped = (Get-Content $VersionStamp -Raw).Trim()
+    Write-Host "  Version     : $stamped (from $VersionStamp)"
 }
