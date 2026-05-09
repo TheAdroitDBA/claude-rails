@@ -16,7 +16,7 @@ Feature success -- run the full completion pipeline in order. Do not skip steps.
 
 6. Update memory files: add new gotchas, architecture changes, or conventions discovered during implementation.
 
-7. Update feature doc: mark all success criteria checked, ensure ## Files section is current, verify ### Progress has an entry for every decision point.
+7. Update feature doc: ensure ## Files section is current, verify ### Progress has an entry for every decision point, then reconcile success criteria. For each criterion: if Progress shows the approach changed, rejected, or was dropped, apply the strikethrough convention from feature-conventions.md ("Reconciling changed criteria") -- strike the original, append the replacement and the reason it failed, link the Progress entry. Only after reconciliation: mark surviving criteria checked. Do not tick a criterion whose Progress trail shows divergence.
 
 8. Deviation summary: if the feature doc has a ## Deviation from conventions section, surface each deviation as one line in the closure output. Format: convention-name: one-line rationale. A bullet without a colon blocks closure -- fix it or add the rationale before continuing.
 

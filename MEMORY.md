@@ -11,6 +11,7 @@ claude-rails is the portable framework that eliminates token waste, repetitive t
 3. All operations must be idempotent (safe to re-run).
 4. Hooks are opt-in per repo via a marker file (`.claude/feature-doc-required`).
 5. Every feature doc must have a `### Progress` checklist under `## Status`. Update it at every decision point during the session -- not just at the end. A decision point is: starting a step, completing a step, rejecting an approach, or changing a criterion. Write the checklist entry BEFORE the code so intent survives a crash. Add the commit hash after. The last entry should always say what to do NEXT (the session handoff line).
+6. When a success criterion changes mid-feature, reconcile in place using the strikethrough convention (see `conventions/feature-conventions.md` "Reconciling changed criteria"): `~~original~~ -> replacement. Reason: <why it failed>. (Progress <date>)`. Never silently rewrite a criterion; never tick a stale criterion at `/fs`.
 
 ## Token Hierarchy
 

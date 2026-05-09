@@ -142,6 +142,39 @@ sub-features stubbed or commented, not absent. Keeps the file shape
 stable across the feature's lifetime and prevents churn when Slice N
 lands.
 
+## Reconciling changed criteria
+
+Success criteria change during implementation. When a criterion is
+superseded -- the approach was rejected, the constraint dissolved, the
+chosen path differs from what was written -- do not silently rewrite it
+and do not tick a stale box at closure. Strike the original in place
+and append the replacement plus the reason it failed:
+
+```
+- [x] ~~Use Redis for caching~~ -> in-memory LRU cache. Reason:
+  deploy added a second VM dependency the host did not justify; eviction
+  needs were satisfied by a 1k-entry LRU. (Progress 2026-05-09)
+```
+
+Required parts:
+
+- `~~strikethrough~~` on the original criterion text. Preserves history
+  in the body where future criteria-reads will see it.
+- `->` then the replacement criterion (or `dropped` if abandoned).
+- **Reason:** one line naming the concrete failure or new constraint.
+  "Changed approach" is not a reason; "Redis required a second VM the
+  deploy did not justify" is.
+- Pointer to the `### Progress` entry that justified the change, dated.
+
+This convention does double duty: the body matches what was actually
+built (so `/fs` does not tick a stale criterion), and the rejected path
+stays visible to prevent re-litigation later in the same feature. The
+Stuck Protocol step 4 ("has this approach already been REJECTED?")
+relies on these strikes being readable next to the live criteria.
+
+`/fs` step 7 enforces this: a criterion checked done whose Progress
+trail shows divergence must be reconciled before closure.
+
 ## Declaring a deviation
 
 When a convention genuinely does not fit, the feature doc names it
