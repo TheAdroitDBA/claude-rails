@@ -31,6 +31,17 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "ENFORCEMENT: claude-rails version drift banner. Run this check ONCE at session start and emit output ONLY if a banner is warranted:\n\n1. Read `~/.claude/claude-rails-version` (installed framework version on this machine). If the file does not exist, print one line: 'NOTE: claude-rails not version-stamped on this machine. Run install.sh or install.ps1 from the framework repo to enable conformance tracking.' and STOP.\n2. Skip this banner if the current repo has no `.claude/feature-doc-required` marker (the repo has not opted into claude-rails enforcement; banner is noise).\n3. Read `<current-repo>/.claude/claude-rails-version` (this repo's last-validated version). If the file does not exist, treat the repo version as `0.0.0`.\n4. Parse both as `MAJOR.MINOR.PATCH`.\n5. Compute the relationship and emit at most ONE line:\n   - Equal: stay silent.\n   - `installed > repo`, same MAJOR: print 'claude-rails {installed} installed; this repo last validated against {repo}. Run /check-conformance when ready.'\n   - `installed > repo`, across MAJOR: print 'WARN: claude-rails MAJOR-VERSION MISMATCH: framework moved from {repo MAJOR}.x to {installed MAJOR}.x since this repo was validated. Generators that would corrupt files MUST refuse until /check-conformance is run.' Audit/generator hooks treat this as a fail-closed condition.\n   - `installed < repo`: print 'NOTE: claude-rails {installed} installed but this repo expects {repo}. Update your local claude-rails clone before running audits.'\n6. Do not emit anything else. Do not run other tools. The banner is informational only."
+          }
+        ]
+      }
     ]
   }
 }

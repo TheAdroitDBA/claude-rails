@@ -17,14 +17,29 @@ Pick the source from the highest tier that applies:
 
 1. **Live system state.** Queryable at build/audit time: APIs, system
    commands, code AST, file metadata. Cannot drift; it IS the state.
-   Examples: Proxmox API for VM config, `pct config <id>` for LXC
-   mounts, `smartctl` for disk serials, `crontab` for backup schedules,
-   `git log` for change history, AST parsers for code symbols.
+   Live state has two sub-tiers with different update characteristics:
+
+   1a. **Slow-moving facts** -- change on hardware swap, service
+       deploy, or schema migration. Examples: disk serial, RAID
+       layout, ZFS pool composition, exposed port, code symbol name.
+       Generated into doc markers; queried at commit/build/audit time.
+
+   1b. **Volatile facts** -- change every minute or faster. Examples:
+       capacity used %, current connections, IOPS, scrub progress,
+       error counters. **MUST NOT be written into markdown.** Volatile
+       facts belong in telemetry (Prometheus, Grafana) and are
+       referenced from docs by linking the panel, not by inlining the
+       value. A markdown audit can never converge against live volatile
+       data; trying produces noise that destroys signal.
 
 2. **Structured data file.** Hand-authored once, consumed by
    generators. A single canonical record. Examples: `inventory.toml`
-   for hosts/services, a manifest mapping app paths to storage IDs,
-   an aggregation manifest for cross-repo doc pull.
+   for hosts/services, `storage_inventory.toml` keyed by surrogate ID,
+   a manifest mapping app paths to storage IDs, an aggregation manifest
+   for cross-repo doc pull. Every structured-data file MUST have a
+   schema (JSON Schema, Pydantic model, or equivalent) and a
+   `schema_version` field. The schema is the canonical contract; the
+   markdown view is rendered from it.
 
 3. **Generated docs.** Markdown blocks emitted into marker-bounded
    regions (see Marker Convention below) from tier-1 or tier-2
@@ -38,6 +53,43 @@ Pick the source from the highest tier that applies:
 A fact that exists in tier 1 or 2 cannot also be hand-typed in tier 4.
 The rule does not move with convenience; if you find yourself typing
 a value, ask which tier owns it.
+
+### Render at build, do not store inherited columns
+
+When a consumer doc references another doc's facts (e.g. a service doc
+inheriting Tier/Redundancy/Backup attributes from a storage inventory
+row), the consumer MUST NOT store the inherited values as text. The
+consumer references the source by stable ID; inherited columns are
+rendered at build time from the source.
+
+Storing inherited columns creates an update-anomaly surface: when the
+source row changes, every consumer's denormalized cells must be
+updated in lockstep. The audit catches drift after the fact, but it
+does not prevent the write storm. Render-at-build eliminates the
+drift surface entirely rather than auditing it.
+
+This applies to: storage attribute inheritance, host-attribute
+inheritance, configuration-attribute inheritance -- any case where a
+consumer doc would otherwise duplicate values from an authoritative
+source. The cross-doc reference (link, transclusion) is sufficient;
+the value flows from the source on every build.
+
+### Surrogate IDs and labels
+
+Identifier shapes that encode mutable attributes -- e.g. a storage ID
+of `<host>.<share>.<protocol>` -- rot when any component is renamed.
+Hosts get renamed; shares get moved; protocols get upgraded. Every
+such rename forces a rewrite of every consumer reference.
+
+The recommended shape: an opaque surrogate identifier (ULID, UUID,
+content hash) plus a labels map carrying the human-readable
+attributes. Renames touch labels; identity stays stable. Consumer
+references the surrogate, not the labels.
+
+Where a domain has a strong stability story for the natural key (e.g.
+disk serial numbers do not change), the surrogate may be elided and
+the natural key used directly -- with the caveat that renames then
+require a coordinated migration.
 
 ### What stays hand-authored
 
@@ -127,8 +179,12 @@ output from multiple generators (different marker labels).
 Sections in order:
 
 - `# Feature: <name>` — title.
-- `## What It Does` — hand-authored intent (tier 4).
-- `## Success Criteria` — hand-authored numbered criteria (tier 4).
+- Frontmatter (required) — `owner`, `review-by` interval (e.g. `90d`),
+  `last-reviewed` date. Audited; missing or overdue values fail the
+  audit.
+- `## What It Does` — hand-authored intent (tier 4, explanation mode).
+- `## Reference (Criteria)` — numbered success criteria, structured
+  for lookup. Each criterion is pass/fail testable from the outside.
   Generated facts MAY appear inside criteria text via inline markers
   (`<!-- gen:value capacity --> 17.7 TB <!-- gen:end -->`) where a
   criterion needs to assert a current measured value.
@@ -138,6 +194,12 @@ Sections in order:
 - `## Files` — list of code files this feature owns. Generators MAY emit
   this list when feature scope is path-glob-derived.
 - `## Scope` — globs the feature controls.
+
+The `## Reference (Criteria)` and `## What It Does` (explanation)
+section labels are explicit Diátaxis-mode markers within one file.
+This is a pragmatic split: criteria are reference, the rest is
+explanation, and labelling them keeps both authors and readers honest
+about which mode they are in.
 
 Anything that names a system fact (capacity, IP, count) inside a
 feature doc must come from a generated marker, not be typed inline.
@@ -189,22 +251,168 @@ Restrictions on the mermaid block:
 ## Cross-Repo Link Convention
 
 When a doc in one repo references a doc in another, use the published
-site path:
+site path. The published path namespace:
 
 ```
-[link text](/software/<reponame>/features/<feature>/)
-[link text](/software/<reponame>/flows/<flow>/)
+[link text](/repos/<reponame>/features/<feature>/)
+[link text](/repos/<reponame>/flows/<flow>/)
 [link text](/hardware/<section>/)
+[link text](/operations/<section>/)
 ```
+
+`/repos/<reponame>/` is the canonical aggregation namespace. (Earlier
+drafts used `/software/<reponame>/`; that was renamed to `/repos/`
+per documentation-expert audit -- "software" is a vacuous bucket
+label since every doc on the site is about software, while "repos"
+accurately names what the bucket holds.)
 
 In-repo links between docs in the same repo stay relative to the file
 so they work without a server (e.g. local `mkdocs serve` against a
 single repo, or simple GitHub rendering).
 
 The aggregator script (in the repo that publishes the site) rewrites
-relative links to absolute `/software/<reponame>/...` paths during the
-build. Authors never type a `/software/...` path for a doc in their
+relative links to absolute `/repos/<reponame>/...` paths during the
+build. Authors never type a `/repos/...` path for a doc in their
 own repo.
+
+## Transclusion (Inline Cross-Doc Facts)
+
+Procedures and runbooks need to inline specific values from canonical
+sources without forcing the entire prose to live inside a marker.
+Transclusion handles this:
+
+```
+SSH to {{host:brain:ip}} and run `pct config 206`.
+The disk's grown-defect count is {{risk-register:3:status}}.
+```
+
+At build time, transclusion references resolve from the cited source.
+A reference of the form `{{<source>:<key>:<attribute>}}` means: fetch
+the named attribute of the keyed entity from the named source, replace
+the reference with that value, fail the build if the entity or
+attribute is missing.
+
+Sources MUST be registered (a small mapping in the repo's docs config
+declaring `host` resolves from `inventory.toml`, `risk-register`
+resolves from `docs/operations/risk-register.md`, etc.). Unregistered
+sources fail the audit.
+
+Transclusion is what lets prose like "ssh to {{host:brain:ip}}" stay
+readable AND keep the IP single-sourced. Without it, every runbook
+either hard-codes IPs (drift) or wraps every value in a marker block
+(unreadable).
+
+## Versioning and Releases
+
+The framework adopts [Semantic Versioning](https://semver.org/) at the
+whole-framework level. One version applies to all `conventions/`,
+`commands/`, `templates/`, and `.claude-plugin/hooks/` content.
+
+`MAJOR.MINOR.PATCH`:
+
+- **MAJOR** — breaking changes (see classification below). In `0.x`,
+  breaking changes ride on MINOR bumps and are explicitly tagged
+  `**BREAKING**` in the changelog entry.
+- **MINOR** — backwards-compatible additions: new optional frontmatter
+  field, new doc type, new convention section that does not invalidate
+  existing docs.
+- **PATCH** — fixes that do not change the contract: typos, clarified
+  wording, corrected examples.
+
+Stay in `0.x` until the conventions stabilize across at least two
+adopting repos. Move to `1.0.0` only when committing to deprecation
+discipline (one MINOR-release deprecation window before removal at the
+next MAJOR).
+
+### Breaking Change Classification
+
+Apply this table on every PR that touches `conventions/`, `commands/`,
+`templates/`, or `.claude-plugin/hooks/`. The classification appears in
+the changelog entry.
+
+| Change | Classification | Why |
+|--------|----------------|-----|
+| Add an optional frontmatter field | MINOR | Existing docs still parse and render. |
+| Add a new doc type (e.g. tutorial) | MINOR | Pure addition; repos that don't author it are unaffected. |
+| Add a new optional generator hook | MINOR | Existing generators continue to satisfy the contract. |
+| Rename a marker pair (e.g. `<!-- generated:start -->` → `<!-- gen:start -->`) | **MAJOR** | Every existing generated block stops being recognized; every generator stops writing the right region. |
+| Change a path namespace (e.g. `/software/` → `/repos/`) | **MAJOR** | Every cross-repo link 404s; aggregator nav assembly breaks. |
+| Make an optional field required (e.g. `owner` becomes mandatory) | **MAJOR** | Existing docs without the field fail validation. |
+| Remove a previously-supported value (e.g. drop `Status: PARKED`) | **MAJOR** | Existing docs using the value fail. |
+| Change a generator's audit semantics (e.g. add a stricter check) | **MINOR** if pre-existing docs continue to pass; **MAJOR** if it would fail any compliant doc. |
+| Tighten a regex or schema such that previously-accepted input fails | **MAJOR** | Same as removing a value. |
+| Loosen a regex or schema such that previously-rejected input now passes | MINOR | Strictly additive. |
+
+When in doubt: ask "would an adopting repo need to change anything to
+keep its current `--audit` clean?" If yes, MAJOR. If no, MINOR.
+
+### Deprecation Cycle
+
+A deprecated element keeps working for at least **one MINOR release**
+before removal at the next MAJOR. Each deprecation entry in the
+changelog includes:
+
+```
+### Deprecated in 0.4.0, removed in 0.6.0
+- `<element>` — what is deprecated.
+- Replacement: `<new-element>` — what to use instead.
+- Migration: `<codemod-or-manual-steps>` — how adopting repos migrate.
+- Removal version target: `<version>`.
+```
+
+If automation is feasible, claude-rails ships a `migrate` codemod
+under `commands/migrate-<element>.md`. Manual migrations document
+explicit steps in the deprecation entry.
+
+The deprecated element stays callable until the removal version --
+generators continue to emit; audits continue to accept; the only
+change is the deprecation banner at session start (see
+"Conformance and Adoption" below).
+
+### Generator Refusal on Major Mismatch
+
+A generator MUST refuse to run when the framework version installed
+on the machine and the version the repo was last validated against
+disagree across a MAJOR boundary. Refusal looks like:
+
+```
+[FAIL] claude-rails major-version mismatch:
+  installed:           0.4.x
+  repo last validated: 0.3.x
+  Run /check-conformance and update the repo's
+  .claude/claude-rails-version after migrating.
+```
+
+Within-MAJOR mismatches warn but proceed. The default-deny posture on
+MAJOR drift exists because a generator that writes to a renamed marker
+or emits in a removed format produces silent corruption -- the worst
+failure mode.
+
+## Conformance and Adoption
+
+Each adopting repo records the framework version it was last validated
+against in `.claude/claude-rails-version`. The framework writes
+`~/.claude/claude-rails-version` at install time (the *installed*
+version on the machine).
+
+`/check-conformance` is the slash command that reconciles them:
+
+- Reports installed version, repo's last-validated version, and any
+  conformance violations against the installed version's conventions.
+- Exits non-zero on violations.
+- Updates `.claude/claude-rails-version` only after the user
+  acknowledges any violations and the repo passes.
+
+Session-start banner behavior:
+
+- `installed > repo`, same MAJOR — one-line banner: "claude-rails
+  X.Y.Z installed; this repo last validated against X.Y0.Z0. Run
+  /check-conformance."
+- `installed > repo`, across MAJOR — loud warning + audit refusal
+  until `/check-conformance` runs and the repo is updated.
+- `installed < repo` — warn that the local install is older than what
+  the repo expects. Continue, but flag features the repo uses that
+  the older claude-rails doesn't ship.
 
 ## Repo Aggregation Contract
 
