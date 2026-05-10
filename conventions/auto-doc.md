@@ -260,11 +260,46 @@ site path. The published path namespace:
 [link text](/operations/<section>/)
 ```
 
-`/repos/<reponame>/` is the canonical aggregation namespace. (Earlier
-drafts used `/software/<reponame>/`; that was renamed to `/repos/`
-per documentation-expert audit -- "software" is a vacuous bucket
-label since every doc on the site is about software, while "repos"
-accurately names what the bucket holds.)
+`/repos/<reponame>/` is the canonical aggregation namespace. Aggregated
+content lives under one `Repos` nav bucket and one URL prefix, not as
+top-level peers of the host site's IA. (Earlier drafts used
+`/software/<reponame>/`; renamed to `/repos/` because "software" is a
+vacuous bucket label.)
+
+### Long-term target — IA-by-mode-and-audience
+
+Treating "the repo that authored a doc" as a navigation concept is an
+authorship-model leak into the audience-facing IA. An operator looking
+up "how do I deploy a mediavortex worker" is asking a how-to question
+about a service, not "show me everything from the mediavortex git repo."
+
+The long-term direction is to route aggregated docs into the host
+site's IA buckets by declared **mode** (Diátaxis: how-to / reference /
+explanation / tutorial) and **target section** (Operations / Hardware /
+Services / etc.), eliminating `Repos` as a nav bucket. A mediavortex
+runbook would land under Operations alongside other runbooks; a
+mediavortex architecture explanation would land alongside other
+architecture explanations.
+
+This requires:
+
+- `docs.export.yml` (or equivalent per-repo manifest) declares `mode`
+  and `target_section` per file, not just a flat `nav` tree.
+- The aggregator becomes routing-aware: it consults the host site's IA
+  schema and slots each aggregated file into the correct destination.
+- Cross-repo links use mode/section paths (`/operations/<doc>/`,
+  `/services/<service>/<doc>/`) and a build-time redirect map keeps
+  `/repos/<reponame>/<doc>/` working until consumers migrate.
+
+Until that lands, all aggregated content stays under `/repos/<reponame>/`
+so the convention has exactly one stable namespace to redirect from.
+The migration when the routing-aware aggregator ships will be a MAJOR
+bump per this convention's breaking-change classification (path
+namespace change), with a deprecation cycle: `/repos/<reponame>/<doc>/`
+keeps redirecting to the routed path for at least one MINOR before
+removal. Bookmarks survive.
+
+### In-repo links
 
 In-repo links between docs in the same repo stay relative to the file
 so they work without a server (e.g. local `mkdocs serve` against a

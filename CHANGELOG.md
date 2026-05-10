@@ -8,6 +8,21 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ## [Unreleased]
 
+### Changed
+
+- `conventions/auto-doc.md` — cross-repo link convention extended with
+  the **long-term target** (IA-by-mode-and-audience) per the
+  documentation-expert audit. Both shapes of the question — `/repos/<reponame>/`
+  versus flat `/<reponame>/` — leak the authorship model into the
+  audience-facing IA. The right end-state is to route aggregated docs
+  into the host site's IA buckets by declared `mode` and
+  `target_section`, eliminating `Repos` as a nav bucket. Until the
+  aggregator gains routing capability, all aggregated content stays
+  under `/repos/<reponame>/` so the convention has one stable namespace
+  to redirect from when migration happens. **MINOR** (clarifies the
+  long-term direction; the current `/repos/` namespace stays the
+  canonical interim namespace).
+
 ### Added
 
 - `conventions/style-guide.md` — voice, tone, terminology, code-block,
