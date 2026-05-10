@@ -8,6 +8,10 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ## [Unreleased]
 
+### Added
+
+- `conventions/naming.md` — hostname naming convention. Separates canonical hostname (anchored to hardware, used by every system tool) from friendly alias (mutable, DNS CNAME). Defines `<role>-<form>-<instance>` format, suggested role vocabulary (`host`, `worker`, `client`, `srv`, `kiosk`, `db`), hardware-identity-in-inventory rule, and migration policy that exempts existing friendly-as-canonical hosts. **MINOR** (new convention; non-breaking for existing repos).
+
 ### Changed
 
 - `conventions/auto-doc.md` — cross-repo link convention extended with
