@@ -137,6 +137,26 @@ replacement of one never touches another:
 <!-- generated:steps:end -->
 ```
 
+### Primary vs. secondary blocks
+
+The bare label `<!-- generated:start -->` is reserved for the **primary**
+generator-owned region in a file. A document MAY contain at most ONE
+bare block. Any additional generator-owned regions in the same file MUST
+use a namespaced label (e.g. `generated:storage:start`,
+`generated:diagram:start`).
+
+This means the marker style itself communicates intent: a reader who
+sees `generated:start` knows the file has exactly one generator owning
+content in it; a reader who sees `generated:foo:start` knows the file is
+co-owned by multiple generators and `foo` identifies one of them.
+Generators that produce side-block content in files alongside other
+generators MUST always namespace their marker, regardless of whether the
+target file currently has any other blocks. This keeps adding a new
+generator to an existing file a one-step operation, not a migration.
+
+Audits and metrics that count generated documents recognize both forms
+via `<!-- generated:[a-z_-]*:?start -->`.
+
 Conflict rules:
 
 - A generator MUST only write between markers it owns. Reading or

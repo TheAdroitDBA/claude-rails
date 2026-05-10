@@ -8,6 +8,17 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ## [Unreleased]
 
+### Changed
+
+- `conventions/auto-doc.md` — formalizes the **primary vs. secondary
+  marker** rule that was already implicit in deployed generators. A
+  document MAY contain at most one bare `<!-- generated:start -->`
+  block; any additional generator-owned region in the same file MUST
+  use a namespaced label (e.g. `generated:storage:start`). Audits and
+  metrics that count generated documents recognize both forms via
+  `<!-- generated:[a-z_-]*:?start -->`. **MINOR** (clarifies an
+  unwritten rule; no generator changes required).
+
 ### Added
 
 - `conventions/naming.md` — hostname naming convention. Separates canonical hostname (anchored to hardware, used by every system tool) from friendly alias (mutable, DNS CNAME). Defines `<role>-<form>-<instance>` format, suggested role vocabulary (`host`, `worker`, `client`, `srv`, `kiosk`, `db`), hardware-identity-in-inventory rule, and migration policy that exempts existing friendly-as-canonical hosts. **MINOR** (new convention; non-breaking for existing repos).
