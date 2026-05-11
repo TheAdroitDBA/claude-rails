@@ -224,49 +224,91 @@ about which mode they are in.
 Anything that names a system fact (capacity, IP, count) inside a
 feature doc must come from a generated marker, not be typed inline.
 
-### Flow docs (`*.flow.md`)
+### Flow docs (`*.flow.md` + `*.flow.toml`)
 
-Single source: a `flowchart` mermaid block. Authors edit the mermaid;
-both the published rendering and the AI-readable step table are
-derived from it.
+Single source: a sibling TOML file conforming to
+[`flow-source.schema.json`](flow-source.schema.json). Authors edit the
+TOML; the mermaid diagram, the step table, and the failure-modes table
+are ALL rendered from it into marker blocks in the `.flow.md`.
+
+This pattern follows the principle that a hand-authored mermaid block
+is still a hand-authored source — relocating the canonical from a table
+to a diagram does not reduce drift surface. Both renderings (diagram
+and table) come from one structured source.
+
+```toml
+# docs/flows/my-pipeline.flow.toml
+schema_version = 1
+entry_point = "Operator boots the recovery USB."
+
+[[steps]]
+id     = "S1"
+name   = "Firmware POST"
+where  = "target host firmware"
+detail = "Loads the USB bootloader after device selection."
+
+[[steps]]
+id     = "S2"
+name   = "GRUB loads kernel"
+where  = "USB boot partition"
+detail = "Default menu entry chosen after a short timeout."
+
+[[failure_modes]]
+trigger = "USB not visible in firmware boot menu"
+symptom = "no USB option appears at F11/F12"
+cause   = "target host is UEFI-only or Legacy-only while the USB only supports the other"
+fix     = "USB image is built as a hybrid UEFI+Legacy/MBR so it boots in either mode"
+```
+
+The corresponding `.flow.md` becomes a thin shell with marker pairs:
 
 ```markdown
 # Flow: <name>
 
+## Entry Point
+
+<!-- generated:entry:start -->
+Operator boots the recovery USB.
+<!-- generated:entry:end -->
+
 ## Diagram
 
+<!-- generated:diagram:start -->
 \```mermaid
-flowchart LR
-  src[Source] --> proc[Process]
-  proc --> sink[Sink]
+graph TD
+  S1["Firmware POST"]
+  S2["GRUB loads kernel"]
+  S1 --> S2
 \```
+<!-- generated:diagram:end -->
+
+## Step Table
 
 <!-- generated:steps:start -->
-| # | Step | What it does |
-|---|------|--------------|
-| 1 | Source | … |
-| 2 | Process | … |
-| 3 | Sink | … |
+| # | Step | Where | What it does |
+|---|------|-------|--------------|
+| 1 | Firmware POST | `target host firmware` | Loads the USB bootloader after device selection. |
+| 2 | GRUB loads kernel | `USB boot partition` | Default menu entry chosen after a short timeout. |
 <!-- generated:steps:end -->
 
 ## Failure Modes
 
-(hand-authored prose)
+<!-- generated:failures:start -->
+| Trigger | Symptom | Cause | Fix |
+|---------|---------|-------|-----|
+| USB not visible in firmware boot menu | no USB option appears at F11/F12 | UEFI/Legacy mismatch | hybrid UEFI+Legacy USB image |
+<!-- generated:failures:end -->
+
+## Notes (hand-authored)
+
+Anything outside the marker pairs is hand-authored and preserved on
+regeneration.
 ```
 
-The mermaid block is the source of truth. The step table is generated
-from the mermaid AST: each node becomes one row in document order; node
-labels become step names; edge labels (where present) flow into the
-"What it does" column. claude-rails ships the generator. Authors do
-not edit the table.
-
-Restrictions on the mermaid block:
-
-- Type MUST be `flowchart` (LR, TB, RL, BT all permitted).
-- Each node MUST have a stable id.
-- Subgraphs are permitted; they nest the rows.
-- Decisions (conditional edges) are permitted; the table renders them
-  as numbered branch rows.
+Authors edit ONLY the TOML. The generator (`generate_flow_doc.py` in
+the consuming repo; future home in `claude-rails-doctools` package) is
+invoked from the repo's pre-commit and publish-gate. v1 of the schema
+supports linear flows only; branching is a deferred MINOR.
 
 ## Cross-Repo Link Convention
 

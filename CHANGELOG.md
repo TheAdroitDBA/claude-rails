@@ -8,7 +8,26 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ## [Unreleased]
 
+### Added
+
+- `conventions/flow-source.schema.json` — JSON Schema (`schema_version = 1`)
+  for `*.flow.toml` files. Defines structured source of truth for flow
+  documents: `entry_point`, ordered `steps[]` (id, name, where, detail,
+  optional `next`), optional `failure_modes[]`. **MINOR** (additive;
+  enables auto-rendering of mermaid + step table + failure modes from
+  one source via a generator).
+
 ### Changed
+
+- `conventions/auto-doc.md` — `### Flow docs` section rewritten. The
+  previous convention treated the mermaid block as the source of truth
+  and generated the step table from it; both were hand-authored
+  ultimately. Replaced with `*.flow.toml` as the structured source,
+  with mermaid + step table + failure modes ALL rendered into marker
+  blocks (`generated:entry`, `generated:diagram`, `generated:steps`,
+  `generated:failures`) by a generator. **MINOR** (no production flow
+  doc was using the old mermaid-as-source pattern; rewriting clarifies
+  intent before the first generator ships).
 
 - `conventions/auto-doc.md` — formalizes the **primary vs. secondary
   marker** rule that was already implicit in deployed generators. A
