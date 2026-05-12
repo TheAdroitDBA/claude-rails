@@ -11,7 +11,7 @@ Do NOT investigate, fix, or expand scope. Capture context only -- these steps pr
 
 2. Identify which feature doc(s) this bug violates. A bug always violates at least one success criterion.
 
-3. Check that a feature doc exists for each affected feature. Create a stub if none exists (criteria can be minimal at this stage).
+3. Check that a feature doc exists for each affected feature. Document this in the bug if it does not exist.
 
 4. Add a [BUG] tagged criterion to the relevant feature doc(s). The criterion should be testable: describe what "fixed" looks like, not just what is broken.
 
@@ -20,3 +20,5 @@ Do NOT investigate, fix, or expand scope. Capture context only -- these steps pr
 6. Write a 2-3 line entry in the issues tracker: what breaks, which feature criterion it violates, and what file/function to look at first.
 
 7. Report: use /t to investigate and fix in a dedicated session.
+
+Report back to the user: done <action taken>
