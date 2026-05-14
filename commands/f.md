@@ -10,6 +10,10 @@ Finalize the current feature. Work through these steps in order:
 
 3. Mark the feature doc ## Status as COMPLETE.
 
-4. Remove resolved bugs from the issues tracker (memory/KNOWN-ISSUES.md or the declared tracker). Only remove entries that are verifiably fixed by this work.
+4. Move resolved bugs from **Active** to **Resolved** in the issues tracker (memory/KNOWN-ISSUES.md or the declared tracker). Append ` | resolved: <today's date>` to each entry. Only move entries that are verifiably fixed by this work. Do NOT delete entries.
 
-5. Run git status and report the current state of the working tree.
+5. If the **Resolved** section has more than 10 entries, move the oldest resolved entries to `memory/KNOWN-ISSUES-ARCHIVE.md` (create the archive file if it does not exist).
+
+6. Quick tracker hygiene (while the tracker is open): scan **Active** entries. Flag any that are older than 30 days or whose linked `[BUG]` criterion no longer exists in the feature doc. Report findings inline -- do not block finalization.
+
+7. Run git status and report the current state of the working tree.

@@ -17,8 +17,10 @@ Do NOT investigate, fix, or expand scope. Capture context only -- these steps pr
 
 5. Check whether a flow doc covers the affected pipeline. If none exists, flag the gap -- /t will create the flow doc before fixing.
 
-6. Write a 2-3 line entry in the issues tracker: what breaks, which feature criterion it violates, and what file/function to look at first.
+6. Write an entry in the **Active** section of the issues tracker using this format: `- <description> | area: <feature/area> | criterion: <feature-doc#criterion-number> | <today's date>`. Include what breaks and what file/function to look at first.
 
-7. Report: use /t to investigate and fix in a dedicated session.
+7. If the tracker has a **Resolved** section with more than 10 entries, move the oldest resolved entries to `memory/KNOWN-ISSUES-ARCHIVE.md` (create the archive file if it does not exist).
+
+8. Report: use /t to investigate and fix in a dedicated session.
 
 Report back to the user: done <action taken>

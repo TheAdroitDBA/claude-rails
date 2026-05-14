@@ -14,3 +14,8 @@ Report what is open and what needs attention:
 3. Report all open items grouped by category: [BUG] criteria, tech debt, parked features (IN PROGRESS with no recent progress entry), NEXT handoff lines with no owner.
 
 4. Flag anything that needs immediate attention: blocking bugs, features that are IN PROGRESS but stalled, or KNOWN-ISSUES entries with no feature doc tracking them.
+
+5. Review the known-issues tracker lifecycle:
+   - Flag **Active** entries older than 30 days with no linked `[BUG]` criterion in any feature doc (orphaned issues).
+   - Flag **Active** entries whose linked `[BUG]` criterion has been removed from the feature doc (silently resolved -- should be in Resolved).
+   - If the **Resolved** section has more than 10 entries, recommend archiving the oldest to `memory/KNOWN-ISSUES-ARCHIVE.md`.

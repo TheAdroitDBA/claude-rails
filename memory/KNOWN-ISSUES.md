@@ -1,7 +1,9 @@
 # Known Issues
 
-## 1. project-setup command is 438 lines
+## Active
 
-Templates extracted to `templates/` directory, but `commands/project-setup.md` remains long. Steps 2-3 (orientation audit detail + legacy-detection bash blocks) are the bulk. Low priority -- the command works correctly, it is just verbose.
+- project-setup command is 438 lines -- templates extracted to `templates/` but command remains verbose (steps 2-3 orientation audit detail + legacy-detection bash blocks are the bulk) | area: commands/project-setup | 2025-01-01
 
-**Status**: open, low priority
+## Resolved
+
+- (none yet)
