@@ -31,13 +31,15 @@ The framework also writes a `.claude/rails-version` file alongside the existing 
 
 12. `/rails-sync` refuses to overwrite across a major-version boundary unless invoked with an explicit `--major` flag. This applies regardless of hash match: a clean, hash-matching block stamped at v0.x will NOT be silently bumped to v1.x without the flag. The intent is to force operator acknowledgement of breaking changes; semver majors are by definition not routine bumps.
 
+13. `commands/rails-sync.md` includes a `## Release-cut workflow` note explaining that when claude-rails itself ships a new `VERSION`, the maintainer runs `/rails-sync` against the framework repo's own `CLAUDE.md` and `README.md` as part of the release commit -- updating the stamped version and hash in the managed block. This makes self-hosting an explicit ritual rather than an afterthought, and is the first verification step before any external repo is synced.
+
 ## Status
 
 NOT STARTED
 
 ### Progress
 
-- [ ] Phase 0: confirm shipping order -- this feature ships AFTER stack-anchor-and-bug-ids so the first managed-block sync proves the design with a real version bump
+- [x] Phase 0 (2026-05-16): shipping order confirmed -- stack-anchor-and-bug-ids is COMPLETE (commit 7ae16fb); the first managed-block sync will prove the design with a real version bump
 - [x] Phase 0.5 (2026-05-16): five design holes locked before any implementation -- (1) hash normalization: LF endings, strip trailing whitespace per line, no trailing newline; (2) `templates/managed-blocks/current.md` only, no per-version accumulation -- older-stamped blocks skip hash check; (3) `/rails-sync` prompt options = y/n/d/a per file, no "yes to all" in v1; (4) `.claude/rails-version` is a NEW separate file from `.claude/feature-doc-required` (single responsibility, no semantic overloading); (5) major-version drift refuses overwrite without explicit `--major` flag, with `/w` warning naming the flag
 - [ ] Phase 1: write canonical managed-block template at `templates/managed-blocks/current.md` (pointer-only, under 10 lines, normalized per criterion 3)
 - [ ] Phase 2: define content-hash algorithm and where the canonical-per-version template lives in this repo
