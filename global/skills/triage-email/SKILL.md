@@ -111,7 +111,7 @@ Auto-clean rules match internal noise emails:
 | CSOC advisories | From CSOC (security advisories are FYI) |
 | Recurring alerts | UKLOT-Bad |
 | Deployment confirmations | Subject matches Deploy/Deployment patterns |
-| ServiceNow approvals | nicensc@service-now.com, satmetrix surveys |
+| ServiceNow approvals | nicensc@service-now.com, satmetrix surveys; CHG approval requests + HRC approval reminders -> flag-keep (manager-action, must stay visible) |
 | Vendor notifications | Microsoft (Stephanie Petrakos), Visual Studio, GitHub PAT, SolarWinds security bulletins |
 | Group joins | "You've joined the X group", PE AI Team, PEAK Members, Teams join notifications |
 | Scorecard reminders | "fill out your scorecard" |
@@ -119,7 +119,7 @@ Auto-clean rules match internal noise emails:
 | Marketing webinars | Sunset Learning, Coralogix, `[MARKETING]` subject prefix |
 | HR events | Communication training, mission announcements |
 | Patent invites | Annual submission invites from Moty Cory |
-| ECAB follow-ups | Change manager follow-ups after ECAB approval completion |
+| ECAB follow-ups | "^RE: ECAB" subject pattern only -- the blanket "from Heather Huskey" rule was removed because Senior Change Manager emails include substantive policy decisions that must stay visible |
 
 **Keep patterns** (exempt from auto-clean): ESSP, RSU
 
