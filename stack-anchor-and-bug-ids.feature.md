@@ -38,7 +38,7 @@ Three coupled framework upgrades that close known gaps in the session-lifecycle 
 
 ## Status
 
-READY FOR REVIEW
+COMPLETE
 
 ### Progress
 
@@ -55,7 +55,7 @@ READY FOR REVIEW
 - [x] Phase 4d: commands/project-setup.md uses `tail -n 1` for active slug and reports stack depth; commands/discovery-check.md reads last line for "What is next"
 - [x] Phase 5: verify -- grep BUG- shows no stray non-padded IDs (only `BUG-NNNN`/`BUG-\d{4}`/`BUG-[0-9]+` regexes); remaining `[BUG]` references are intentional (CHANGELOG history + this feature doc's migration-description criterion); stack file smoke-test: depth 1, last line = `stack-anchor-and-bug-ids`, backward-compat PASS
 - [x] Phase 6: alignment cleanup (2026-05-16) -- `/n` step 13 made idempotent via last-line dedup (Hard Rule 3 gap closed); `/f` step 8 and `/fs` step 12 received explicit shell + PowerShell pop scripts (no more "truncate the last line" prose); fix-or-record collapsed from four cases to clean three-way (FIX INLINE / RECORD / PIVOT) in MEMORY.md, docs/glossary.md, templates/project-setup/claude-md.md; criterion 10 reconciled per strikethrough convention; criterion 5 reconciled earlier to match `commands/b.md` impl scope (tracker + archive + all *.feature.md); added `## Test Plan` smoke-test recipe covering criteria 1-5, 7, 11
-- [ ] NEXT: user reviews + approves criteria; on approval run `/fs` to QA, commit with descriptive message, and pop the stack. Then `/n rails-managed-blocks` is unblocked.
+- [x] User approved all 13 criteria as IMPLEMENTED (2026-05-16). Stack popped (depth 1 -> 0; anchor file deleted). `/n rails-managed-blocks` is now unblocked.
 
 ## Test Plan
 
