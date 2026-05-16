@@ -41,13 +41,13 @@ Discover the broken-items tracker from the adopted repo's own declaration. Check
 1. Read `CLAUDE.md` for a declared tracker location. Look for phrases like "known issues", "risk register", "bug tracker", "active issues", or a line naming a specific file.
 2. If CLAUDE.md declares a tracker (e.g. `docs/operations/risk-register.md` or a section in `memory/<project>.md`), read that file as the authoritative source.
 3. If CLAUDE.md does not declare a tracker, fall back to `memory/KNOWN-ISSUES.md` (the claude-rails framework default).
-4. Additionally, scan feature docs for `[BUG]` criteria or `DONE-WITH-BUGS` statuses regardless of where the main tracker lives.
+4. Additionally, scan feature docs for `[BUG-NNNN]` criteria or `DONE-WITH-BUGS` statuses regardless of where the main tracker lives.
 
-If no tracker is declared AND no `memory/KNOWN-ISSUES.md` exists AND no `[BUG]` markers are found, report: "No broken-items tracker discovered; absence is a finding." Do NOT default to "nothing is broken" -- the absence of a tracker is itself the signal.
+If no tracker is declared AND no `memory/KNOWN-ISSUES.md` exists AND no `[BUG-NNNN]` markers are found, report: "No broken-items tracker discovered; absence is a finding." Do NOT default to "nothing is broken" -- the absence of a tracker is itself the signal.
 
 ### 4. What is next?
 
-One sentence. The most load-bearing unfinished work you can identify. Read `.claude/current-feature` if present for the in-flight feature; also scan progress checklists for HANDOFF lines or unchecked boxes marked NEXT.
+One sentence. The most load-bearing unfinished work you can identify. Read the **last line** of `.claude/current-feature` if present for the in-flight feature (the file is a LIFO stack; lines above the last are paused parent features). Also scan progress checklists for HANDOFF lines or unchecked boxes marked NEXT.
 
 ## Step 3: Report the budget
 

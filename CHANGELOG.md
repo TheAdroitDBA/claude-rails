@@ -19,6 +19,18 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ### Changed
 
+- `commands/f.md` and `commands/w.md` — tracker hygiene scan now also
+  flags Active KNOWN-ISSUES entries whose linked criterion's `### Progress`
+  line is checked off (`[x]`). Catches the "fix shipped but tracker
+  never updated" drift case (the criterion still exists and may still
+  carry a `[BUG]` tag, so the existing orphan/removed checks miss it).
+  `/f` is the write-side primary catch (runs the moment a criterion
+  flips to done); `/w` is the read-side safety net for hand-edits that
+  bypass `/f`. **MINOR** (additive — adds a new flag bullet to existing
+  steps; no behavior change for repos with no drift).
+
+### Changed
+
 - `conventions/auto-doc.md` — `### Flow docs` section rewritten. The
   previous convention treated the mermaid block as the source of truth
   and generated the step table from it; both were hand-authored

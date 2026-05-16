@@ -121,7 +121,7 @@ echo "=== Existence check (secondary) ==="
 [ -d .claude/agents ] && echo ".claude/agents/: yes ($(ls .claude/agents 2>/dev/null | wc -l | tr -d ' ') files)" || echo ".claude/agents/: NO"
 [ -d .claude/hooks ] && echo ".claude/hooks/: yes ($(ls .claude/hooks 2>/dev/null | wc -l | tr -d ' ') files)" || echo ".claude/hooks/: NO"
 [ -d .claude/skills ] && echo ".claude/skills/: yes ($(ls .claude/skills 2>/dev/null | wc -l | tr -d ' ') files)" || echo ".claude/skills/: NO"
-[ -f .claude/current-feature ] && echo ".claude/current-feature: $(cat .claude/current-feature)" || echo ".claude/current-feature: NO"
+[ -f .claude/current-feature ] && echo ".claude/current-feature: $(tail -n 1 .claude/current-feature) (stack depth $(grep -c . .claude/current-feature))" || echo ".claude/current-feature: NO"
 [ -f .claude/feature-doc-required ] && echo ".claude/feature-doc-required: yes" || echo ".claude/feature-doc-required: NO"
 [ -f .claude/feature-doc-mode ] && echo ".claude/feature-doc-mode: $(cat .claude/feature-doc-mode)" || echo ".claude/feature-doc-mode: NO"
 grep -q "Plugin Enforcement" CLAUDE.md 2>/dev/null && echo "enforcement instructions: present" || echo "enforcement instructions: MISSING -- /project-setup will add them"
@@ -332,10 +332,10 @@ If README already contains a `## Troubleshooting a Feature` section, leave it al
 
 ### 6e: .claude/current-feature (only if missing, and only with confirmation)
 
-Never guess. Ask the user. If they confirm a slug, write it:
+Never guess. Ask the user. If they confirm a slug, write it as the first line of the stack (the file is a LIFO stack -- one slug per line, last line is active):
 
 ```bash
-printf '<slug>' > .claude/current-feature
+printf '%s\n' '<slug>' > .claude/current-feature
 ```
 
 ### 6f: MEMORY.md (only if missing AND the repo has no MEMORY.md in any valid location)

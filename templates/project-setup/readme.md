@@ -4,7 +4,7 @@
 
 ## Start here
 
-- **What's in flight:** see `.claude/current-feature`
+- **What's in flight:** see the last line of `.claude/current-feature` (the file is a LIFO stack -- lines above the last are paused parent features)
 - **How I work here:** see `CLAUDE.md`
 - **What's broken:** see [actual path to issue tracker]
 - **Feature specs:** colocated `*.feature.md` files next to primary code
@@ -13,7 +13,7 @@
 
 When something is broken, walk the framework top-down before reading source:
 
-1. **Identify which feature is affected.** Check `.claude/current-feature`, or find the nearest feature doc to the misbehaving code.
+1. **Identify which feature is affected.** Check the last line of `.claude/current-feature` (active feature; lines above are paused parents), or find the nearest feature doc to the misbehaving code.
 2. **Read that feature's success criteria.** Name the specific criterion that is failing. If none match, the feature doc is incomplete -- add the missing criterion first.
 3. **Check the issue tracker.** Known broken state lives there. Do not rediscover it.
 4. **Read the flow docs the feature references.** Flow docs list entry points, step tables, and failure modes.

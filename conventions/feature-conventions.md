@@ -207,3 +207,53 @@ separate skills under `claude-rails/skills/starter-*` when a real
 project drives one into existence. A project declares in its own
 `CLAUDE.md` which starter it uses, if any. Starters are opt-in and
 additive: the conventions above apply regardless of starter choice.
+
+## Bug IDs
+
+Every bug recorded by `/b` receives a stable identifier of the form
+`BUG-NNNN` (zero-padded to 4 digits, e.g. `BUG-0042`). The ID is
+assigned at creation time and is globally unique across the repo --
+including the active tracker, the resolved section, and the archive.
+**IDs are never reused**, even after a bug is resolved and archived.
+
+The same ID appears in three places:
+
+1. The tracker entry: `- BUG-NNNN | <description> | area: <feature> | criterion: <feature-doc#N> | <date>`
+2. The feature doc criterion tag: `- [ ] [BUG-NNNN] <testable description>`
+3. Any pivot reference in another feature doc: `- [ ] [BLOCKED BY BUG-NNNN] <parent criterion text>`
+
+Assignment algorithm (the same logic `/b` runs):
+
+```
+NNNN = max(grep -hoE 'BUG-[0-9]+' across tracker + archive + all *.feature.md) + 1
+```
+
+If no IDs exist anywhere in the repo, start at `BUG-0001`. The first
+check of `/b` is dedup: if the new bug matches an existing entry,
+the existing ID is reused and no new one is minted.
+
+## Interrupt tags
+
+When a feature cannot proceed because of a bug too large for an inline
+fix (the PIVOT case in MEMORY.md's fix-or-record rule), the parent's
+blocked criterion gets tagged `[BLOCKED BY BUG-NNNN]` and a new feature
+is pushed onto the `.claude/current-feature` stack to fix the blocker.
+The child feature doc declares its origin with a `## Interrupts:`
+section naming the parent slug.
+
+Format in the parent's `## Success Criteria`:
+
+```
+- [ ] [BLOCKED BY BUG-0042] Retry handler must surface 409 to the user.
+```
+
+Format in the child's feature doc (a top-level section):
+
+```
+## Interrupts: <parent-slug>
+```
+
+When the child is closed with `/fs`, the stack pop resumes the parent
+and `/fs` cross-checks `## Interrupts:` against the new top-of-stack.
+A mismatch surfaces as a warning -- the stack and the doc disagree on
+parentage.

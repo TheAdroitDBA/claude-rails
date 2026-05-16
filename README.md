@@ -94,7 +94,16 @@ For a brand-new project that has no Claude Code structure yet:
    - Generate starter rules in `.claude/rules/` appropriate to the project's stack.
    - Create README files in `.claude/agents/`, `.claude/hooks/`, `.claude/skills/` explaining where project-specific extensions go.
 3. Write your first feature doc: create a `<name>.feature.md` next to the code it describes, with numbered success criteria and a `## Status` line.
-4. Set the current feature: `echo "<name>" > .claude/current-feature`.
+4. Set the current feature: append the slug as a new line in `.claude/current-feature` (the file is a LIFO stack -- one slug per line, last line is the active feature):
+   ```bash
+   # Mac / Linux
+   printf '%s\n' "<name>" >> .claude/current-feature
+   ```
+   ```powershell
+   # Windows PowerShell
+   Add-Content -Path .claude/current-feature -Value "<name>"
+   ```
+   `/n` does this automatically; manual append is only needed when bootstrapping the first feature.
 
 Enforcement starts in `warn` mode by default. Switch to `block` in `.claude/feature-doc-mode` once the team is comfortable.
 

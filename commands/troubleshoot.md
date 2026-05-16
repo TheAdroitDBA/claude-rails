@@ -37,9 +37,9 @@ If no description is provided:
 2. Match `<desc>` against existing entries.
 3. **If no entry found OR entry has no linked feature docs:**
    - Tell user: "No bug report found, recording bug first"
-   - Run the repo's bug-report skill (`/b`) to deduplicate, identify features, create/update feature docs with `[BUG]` criteria.
+   - Run the repo's bug-report skill (`/b`) to deduplicate, identify features, create/update feature docs with `[BUG-NNNN]` criteria.
    - Resume here with the newly created context.
-4. Follow links to feature doc(s) -- load success criteria and any `[BUG]` tagged criteria.
+4. Follow links to feature doc(s) -- load success criteria and any `[BUG-NNNN]` tagged criteria.
 5. If flow docs exist for the area (`*.flow.md` near entry points), load those too.
 
 ### Step 1: Document the Problem
@@ -47,7 +47,7 @@ Before attempting any fix:
 - **Error message**: exact text, error codes, stack traces
 - **Context**: what operation was happening, what state the system was in
 - **Reproduction**: what steps led to this error
-- **Failing criteria**: which `[BUG]` tagged success criteria from the feature doc(s) are violated
+- **Failing criteria**: which `[BUG-NNNN]` tagged success criteria from the feature doc(s) are violated
 
 ### Step 2: Check Documentation First (Token-Efficient)
 Before reading source code, check existing docs in this order:
@@ -77,7 +77,7 @@ State it clearly in one sentence before writing any code. Format:
 - Build and verify zero errors.
 
 ### Step 6: Document the Solution
-- Update the feature doc: remove `[BUG]` tag from the criterion or mark it passing.
+- Update the feature doc: remove `[BUG-NNNN]` tag from the criterion or mark it passing.
 - Add the failure pattern to the appropriate memory/reference file so it's never repeated:
   - Error code + what it means
   - What caused it

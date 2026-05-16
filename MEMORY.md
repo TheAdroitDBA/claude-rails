@@ -12,6 +12,8 @@ claude-rails is the portable framework that eliminates token waste, repetitive t
 4. Hooks are opt-in per repo via a marker file (`.claude/feature-doc-required`).
 5. Every feature doc must have a `### Progress` checklist under `## Status`. Update it at every decision point during the session -- not just at the end. A decision point is: starting a step, completing a step, rejecting an approach, or changing a criterion. Write the checklist entry BEFORE the code so intent survives a crash. Add the commit hash after. The last entry should always say what to do NEXT (the session handoff line).
 6. When a success criterion changes mid-feature, reconcile in place using the strikethrough convention (see `conventions/feature-conventions.md` "Reconciling changed criteria"): `~~original~~ -> replacement. Reason: <why it failed>. (Progress <date>)`. Never silently rewrite a criterion; never tick a stale criterion at `/fs`.
+7. `.claude/current-feature` is a LIFO stack, one slug per line. The **last line** is the active feature. `/n` appends (push); `/f` and `/fs` truncate the last line (pop). A single-line file is a valid depth-1 stack. Never overwrite the file wholesale.
+8. Bugs receive a stable ID at `/b` time of the form `BUG-NNNN` (zero-padded to 4 digits, globally unique, never reused). The ID appears in the tracker entry, in the `[BUG-NNNN]` criterion tag in the feature doc, and in any `[BLOCKED BY BUG-NNNN]` pivot reference. See `conventions/feature-conventions.md` "Bug IDs".
 
 ## Token Hierarchy
 
@@ -24,22 +26,22 @@ Conventions are principles, not invariants. A feature that cannot honor a conven
 - **Build vertically.** Complete slices through the entire stack per feature. Keeps reversal cost low because each feature is self-contained.
 - **Criteria before code.** Write success criteria and get them approved before implementation begins.
 - **Outside-in for user-facing work.** When the feature has a user-visible surface (CLI, UI, API, error message, docs page), work in this order: flow doc -> feature doc -> criteria. Features with no user-visible surface go directly from rules and criteria to code.
-- **Docs before fix.** When troubleshooting (`/t`), ensure the feature doc has a [BUG] criterion and a flow doc covers the affected pipeline BEFORE reading source code or writing a fix.
+- **Docs before fix.** When troubleshooting (`/t`), ensure the feature doc has a `[BUG-NNNN]` criterion and a flow doc covers the affected pipeline BEFORE reading source code or writing a fix.
 - **Learn from failures.** When a tool call, command, or approach fails and you find the fix, save a feedback memory BEFORE moving on: (1) the error pattern, (2) the root cause, (3) the prevention.
-- **Bugs found during feature work: fix or record, never both halfway.** Three-way decision:
-  1. BLOCKING -- the current feature cannot work without a fix. Fix inline, note in progress checklist.
-  2. SMALL + SAME FILE -- fix is under ~10 lines in code you are already touching. Fix inline, note in progress checklist.
-  3. EVERYTHING ELSE -- record it (`/b`) and move on. Do not investigate, do not expand scope.
+- **Bugs found during feature work: fix or record, never both halfway.** Three-way decision -- two questions, three outcomes. Q1: is the fix under ~10 lines AND in code you are already touching? Q2 (only if Q1 = no): is it blocking?
+  1. FIX INLINE -- Q1 = yes. Just fix it and note in the progress checklist. Whether or not it is strictly blocking; if it is that cheap, the choice is forced when blocking and opportunistic when not.
+  2. RECORD (`/b`) -- Q1 = no, Q2 = no. Record with `/b` (mints `BUG-NNNN`) and move on. Do not investigate, do not expand scope.
+  3. PIVOT -- Q1 = no, Q2 = yes. Run `/b <description>` to mint `BUG-NNNN`, tag the parent criterion `[BLOCKED BY BUG-NNNN]`, commit a pause snapshot with `chore(pause): <parent-slug> blocked by BUG-NNNN`, then `/n <blocker-fix>` to push the blocker onto the stack. `/fs` on the blocker pops the stack and resumes the parent.
 
 ## Session Lifecycle
 
 Every work session follows this sequence. If you feel lost, find where you are in this list.
 
-1. **ORIENT** -- `/w` to see what is open. Pick a task. Or read `.claude/current-feature` to resume where you left off.
-2. **LOAD CONTEXT** -- Read the feature doc's progress checklist. The last entry tells you what to do next. If starting a new feature: `/n` to create the doc and criteria first. No code until criteria are approved.
-3. **WORK** -- Implement against criteria. Update the progress checklist at every decision point (before the code, not after). Fix-or-record rule for discovered bugs. If stuck for more than 3 queries, see the stuck protocol below.
+1. **ORIENT** -- `/w` to see what is open. Pick a task. Or read the **last line** of `.claude/current-feature` to resume the active feature (top of stack).
+2. **LOAD CONTEXT** -- Read the feature doc's progress checklist. The last entry tells you what to do next. If starting a new feature: `/n` to create the doc and criteria first (appends to the stack). No code until criteria are approved.
+3. **WORK** -- Implement against criteria. Update the progress checklist at every decision point (before the code, not after). Fix-or-record rule for discovered bugs (four-way decision: BLOCKING+SMALL, SMALL+SAME-FILE, NON-BLOCKING, or PIVOT). If stuck for more than 3 queries, see the stuck protocol below.
 4. **VERIFY** -- Run the test plan table in the feature doc. Fix failures.
-5. **CLOSE** -- `/f` to finalize, or `/fs` if the feature is done. The last progress checklist entry must be a handoff line: what you would do next if you had 5 more minutes. Update `.claude/current-feature` if switching features.
+5. **CLOSE** -- `/f` to finalize, or `/fs` if the feature is done. The last progress checklist entry must be a handoff line: what you would do next if you had 5 more minutes. `/f` and `/fs` pop the top-of-stack automatically; if a parent remains, they print the resume slug and its last unchecked progress entry.
 
 ## Stuck Protocol
 

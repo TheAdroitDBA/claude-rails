@@ -9,7 +9,9 @@
      - Files and Scope
 
 2. Set the current-feature pointer
-   printf '<slug>' > .claude/current-feature
+   The file is a LIFO stack -- one slug per line, last line is the active feature. /n appends automatically; do this manually only when bootstrapping the first feature.
+   Mac/Linux:  printf '%s\n' '<slug>' >> .claude/current-feature
+   Windows:    Add-Content -Path .claude/current-feature -Value '<slug>'
    Sessions load that one doc instead of scanning all of them.
 
 3. Enforcement mode: <enforcement-mode>

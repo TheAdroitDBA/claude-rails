@@ -44,8 +44,13 @@ Canonical vocabulary for the claude-rails framework. Use these terms precisely i
 | **feature scope** | Which files a feature doc covers. Resolved by: (a) explicit `## Scope` glob patterns, or (b) the feature doc's directory and all descendants if no `## Scope` exists. |
 | **scoped feature doc** | A feature doc with an explicit `## Scope` section containing glob patterns that define exactly which files it covers. |
 | **unscoped feature doc** | A feature doc without a `## Scope` section. It covers its own directory and all descendants by default. |
-| **current-feature pointer** | `.claude/current-feature` -- a file containing the slug of the feature currently being worked on. Helps sessions resume without re-orienting. |
+| **current-feature pointer** | `.claude/current-feature` -- a LIFO stack file, one slug per line, **last line = active feature**. `/n` appends (push); `/f` and `/fs` truncate the last line (pop). Single-line files are valid depth-1 stacks. Supports interrupt pivots without losing parent context. |
 | **incremental adoption** | The recommended approach: start with enforcement mode `warn`, let the team build feature docs organically, switch to `block` once comfortable. |
+| **stack frame** | One line in `.claude/current-feature`. The last line is the active frame; lines above are paused parents waiting for their children to close. |
+| **PIVOT** | The third case of the fix-or-record rule: a blocking bug too large for an inline fix triggers a `/b` (assigns `BUG-NNNN`), a `[BLOCKED BY BUG-NNNN]` tag on the parent criterion, a `chore(pause):` commit of the working tree, and `/n` to push a blocker-fix feature onto the stack. |
+| **pause commit** | A `chore(pause): <parent-slug> blocked by BUG-NNNN` commit created automatically by `/n` when the working tree is dirty at PIVOT time. Makes the parent's in-progress state recoverable on any machine. |
+| **Bug ID** | A stable identifier of the form `BUG-NNNN` (zero-padded to 4 digits) assigned by `/b` at creation. Globally unique across tracker + archive + all feature docs; never reused. Appears in the tracker entry, the `[BUG-NNNN]` criterion tag, and any `[BLOCKED BY BUG-NNNN]` pivot reference. |
+| **interrupt tag** | The `[BLOCKED BY BUG-NNNN]` prefix on a parent's success criterion indicating that criterion is paused pending a blocker fix pushed onto the stack. Pairs with the child feature doc's `## Interrupts: <parent-slug>` section. |
 
 **Disambiguation: "scope" has three meanings in the framework. Always qualify:**
 - **enforcement scope** = the directory tree where the framework applies (controlled by the marker file)
@@ -61,5 +66,5 @@ Canonical vocabulary for the claude-rails framework. Use these terms precisely i
 | **stuck protocol** | The procedure when spinning for more than 3 queries without progress: stop, re-read feature doc, re-read flow doc, check progress checklist for rejected approaches, ask the user. |
 | **decision point** | A moment during implementation where intent should be recorded in the progress checklist BEFORE the code: starting a step, completing a step, rejecting an approach, or changing a criterion. |
 | **vertical development** | Building complete slices through the entire stack per feature rather than building layers horizontally. Keeps reversal cost low. |
-| **fix-or-record rule** | Three-way decision for bugs found during feature work: (1) blocking = fix inline, (2) small + same file = fix inline, (3) everything else = record with `/b` and move on. |
+| **fix-or-record rule** | Three-way decision for bugs found during feature work: (1) FIX INLINE = under ~10 lines in code you are already touching, just fix it; (2) RECORD = non-blocking and doesn't fit case 1, use `/b` (mints `BUG-NNNN`) and move on; (3) PIVOT = blocking and doesn't fit case 1 (see PIVOT entry). |
 | **discovery cost** | The token cost of a cold session orienting to a repo. Measured by asking four questions: what is this, what's done, what's broken, what's next. Budget: under 15k tokens. |

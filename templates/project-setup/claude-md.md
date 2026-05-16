@@ -19,14 +19,14 @@ Stop when you have enough context:
 - Feature docs: colocated `*.feature.md` next to primary code
 - Flow docs: colocated `*.flow.md` next to entry-point files
 - Known issues: [actual path to issue tracker]
-- Current feature anchor: `.claude/current-feature`
+- Current feature anchor: `.claude/current-feature` -- LIFO stack, one slug per line, last line is the active feature. `/n` pushes; `/f` and `/fs` pop.
 - Project-specific hooks/skills/agents: under `.claude/` (each directory has a README when populated)
 
 ## Framework essentials
 - **Hard rules:** no emojis in .md files (plain text only); prefer editing existing files over creating new ones; hooks are opt-in per repo via `.claude/feature-doc-required`; all operations idempotent.
 - **Outside-in design:** for features with a user-facing surface, write the flow doc first, then feature doc + criteria. Feature criteria must map to flow steps; they own the no-breaking-changes contract.
 - **Progress checklist:** every in-progress feature doc has a `### Progress` checklist under `## Status`. Update it at every decision point BEFORE the code. Last entry names what to do NEXT.
-- **Fix-or-record rule:** a bug found mid-feature is either blocking (fix now), small+same-file (fix now), or everything else (`/b` record, do not expand scope).
+- **Fix-or-record rule:** a bug found mid-feature has three cases: FIX INLINE (small + same file -- just fix it), RECORD (non-blocking + larger -- `/b` mints `BUG-NNNN`, move on, do not expand scope), or PIVOT (blocking + larger -- `/b` mints `BUG-NNNN`, tag parent criterion `[BLOCKED BY BUG-NNNN]`, `chore(pause):` commit, `/n` the blocker fix to push onto the stack).
 - **Slash commands:** `/n` new feature, `/f` finalize, `/fs` finalize + full pipeline, `/b` bug record, `/bs` bug success, `/t` troubleshoot, `/w` what's open. Available via the claude-rails plugin (`claude --plugin-dir ~/claude-rails`).
 
 ## Plugin Enforcement

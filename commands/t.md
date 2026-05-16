@@ -1,15 +1,15 @@
 ---
-description: Troubleshoot and fix a bug. Doc-first: ensures feature and flow docs exist before touching code so the fix is verifiable and the pipeline is protected against future regressions.
-argument-hint: <bug-description>
+description: Troubleshoot and fix a bug. Doc-first: ensures feature and flow docs exist before touching code so the fix is verifiable and the pipeline is protected against future regressions. Accepts a BUG-NNNN id for exact-match lookup.
+argument-hint: <bug-description-or-BUG-NNNN>
 ---
 
 Troubleshoot: $ARGUMENTS
 
 Follow doc-first order. Do not read source code until step 5.
 
-1. Read the project's issues tracker (discovered from CLAUDE.md; fallback memory/KNOWN-ISSUES.md). Match to an existing entry. If no entry exists, run /b first to record it, then resume here.
+1. Read the project's issues tracker (discovered from CLAUDE.md; fallback memory/KNOWN-ISSUES.md). If `$ARGUMENTS` matches the pattern `BUG-\d{4}`, grep the tracker (and archive) for that exact ID and resolve to the matching entry directly -- no fuzzy matching. Otherwise, match by description. If no entry exists, run /b first to record it (which assigns a `BUG-NNNN`), then resume here.
 
-2. Read the feature doc for the affected feature. If no criterion matches this bug, add a [BUG] criterion before proceeding -- the fix is not verifiable without one.
+2. Read the feature doc for the affected feature. If no criterion matches this bug, add a `[BUG-NNNN]` criterion before proceeding -- the fix is not verifiable without one.
 
 3. Read the flow doc for the affected pipeline. If no flow doc exists, create it before proceeding. The flow doc traces entry points, data steps, and failure modes so the next session does not start from zero.
 
@@ -19,6 +19,6 @@ Follow doc-first order. Do not read source code until step 5.
 
 6. Report root cause and evidence before writing any fix: name the layer, file, function, and the proof that this is the root cause rather than a symptom.
 
-7. Fix the original issue. Verify the fix against the [BUG] criterion from step 2 -- the criterion is the definition of "fixed".
+7. Fix the original issue. Verify the fix against the `[BUG-NNNN]` criterion from step 2 -- the criterion is the definition of "fixed".
 
 8. Update the flow doc if the fix changed the pipeline (e.g. a failure mode that was undocumented is now handled).
