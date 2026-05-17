@@ -35,21 +35,21 @@ The framework also writes a `.claude/rails-version` file alongside the existing 
 
 ## Status
 
-NOT STARTED
+IN PROGRESS
 
 ### Progress
 
 - [x] Phase 0 (2026-05-16): shipping order confirmed -- stack-anchor-and-bug-ids is COMPLETE (commit 7ae16fb); the first managed-block sync will prove the design with a real version bump
 - [x] Phase 0.5 (2026-05-16): five design holes locked before any implementation -- (1) hash normalization: LF endings, strip trailing whitespace per line, no trailing newline; (2) `templates/managed-blocks/current.md` only, no per-version accumulation -- older-stamped blocks skip hash check; (3) `/rails-sync` prompt options = y/n/d/a per file, no "yes to all" in v1; (4) `.claude/rails-version` is a NEW separate file from `.claude/feature-doc-required` (single responsibility, no semantic overloading); (5) major-version drift refuses overwrite without explicit `--major` flag, with `/w` warning naming the flag
-- [ ] Phase 1: write canonical managed-block template at `templates/managed-blocks/current.md` (pointer-only, under 10 lines, normalized per criterion 3)
-- [ ] Phase 2: define content-hash algorithm and where the canonical-per-version template lives in this repo
-- [ ] Phase 3: implement /rails-sync command
-- [ ] Phase 4: extend /w with drift check
-- [ ] Phase 5: update /project-setup to emit the block
-- [ ] Phase 6: update templates/project-setup/claude-md.md and readme.md to include the block stub
-- [ ] Phase 7: glossary entries
-- [ ] Phase 8: verify -- run /rails-sync against this repo (self-hosting), then against one external adopted repo
-- [ ] NEXT: wait for stack-anchor-and-bug-ids to ship before starting Phase 1
+- [x] Phase 1 (2026-05-16): wrote `templates/managed-blocks/current.md` -- 4 lines of canonical inner content (under-10 budget honored), names framework v0.1.0, points at `~/.claude/MEMORY.md` as canonical rules, names `/w` as entry-point command, instructs the reader to run `/rails-sync` on version change. Hash for v0.1.0 = `e74b74e1` (SHA-256 first 8 hex over normalized content per criterion 3: LF endings, trailing whitespace stripped per line, no trailing newline). Verified reproducible via Python on Git Bash; will be re-verified on Mac/Linux when Phase 8 self-host runs.
+- [x] Phase 2 (2026-05-16): subsumed by Phase 0.5 lockdown -- hash algorithm is fully specified in criterion 3 (normalize -> SHA-256 -> first 8 hex), storage location is fully specified in criterion 11 (`templates/managed-blocks/current.md` only, no per-version accumulation). Nothing further to ship for this phase; the hash computation lives inside `/rails-sync` (Phase 3).
+- [ ] Phase 3: implement `/rails-sync` command -- new file `commands/rails-sync.md`. Steps: (a) read framework `VERSION`; (b) scan adopted repo for managed blocks in `CLAUDE.md` and `README.md`; (c) parse start-marker (version + hash); (d) if stamped version == current VERSION, recompute expected hash from `templates/managed-blocks/current.md` and compare; if older, skip hash check; (e) on overwrite needed, per-file prompt y/n/d/a; (f) refuse major drift without explicit `--major` flag; (g) include `## Release-cut workflow` note per criterion 13.
+- [ ] Phase 4: extend `/w` with drift check -- one-line notice on minor/patch drift, warning naming `--major` on major drift (criterion 5). Layered on top of stack-anchor's existing `/w` step 1.
+- [ ] Phase 5: update `/project-setup` to emit the block on scaffold (criterion 6) and write `.claude/rails-version` alongside `.claude/feature-doc-required` (criterion 8).
+- [ ] Phase 6: update `templates/project-setup/claude-md.md` and `templates/project-setup/readme.md` to include the managed-block stub (the markers; `/project-setup` fills in version + hash at write time).
+- [ ] Phase 7: glossary entries (criterion 10) -- `managed block`, `version stamp`, `content hash`, `rails-sync`, `rails-version file`.
+- [ ] Phase 8: verify -- run `/rails-sync` against this repo (self-hosting first, per criterion 13), then against one external adopted repo. Confirm hash reproduces byte-for-byte on Mac/Linux/Windows.
+- [ ] NEXT: Phase 3 -- create `commands/rails-sync.md`. Recommended structure: argument-hint `[--major] [--yes-future]`; steps mirroring criterion 4's hash-validation + prompt flow; `## Release-cut workflow` section per criterion 13. Defer the `--yes` batch flag (out of scope per Phase 0.5 decision 3); document it in the command file as "future flag, not implemented." This phase is the heaviest of the feature -- consider splitting into Phase 3a (command spec) and Phase 3b (cross-platform shell + PowerShell hash recomputation snippets) if the file grows beyond ~80 lines.
 
 ## Files
 
