@@ -14,6 +14,7 @@ claude-rails is the portable framework that eliminates token waste, repetitive t
 6. When a success criterion changes mid-feature, reconcile in place using the strikethrough convention (see `conventions/feature-conventions.md` "Reconciling changed criteria"): `~~original~~ -> replacement. Reason: <why it failed>. (Progress <date>)`. Never silently rewrite a criterion; never tick a stale criterion at `/fs`.
 7. `.claude/current-feature` is a LIFO stack, one slug per line. The **last line** is the active feature. `/n` appends (push); `/f` and `/fs` truncate the last line (pop). A single-line file is a valid depth-1 stack. Never overwrite the file wholesale.
 8. Bugs receive a stable ID at `/b` time of the form `BUG-NNNN` (zero-padded to 4 digits, globally unique, never reused). The ID appears in the tracker entry, in the `[BUG-NNNN]` criterion tag in the feature doc, and in any `[BLOCKED BY BUG-NNNN]` pivot reference. See `conventions/feature-conventions.md` "Bug IDs".
+9. Output discipline. Feature docs are terse: each criterion is one line where possible; `## Test Plan` is a smoke recipe (one line per step naming the criterion verified), not a re-statement of criteria; `## What It Does` is 1-2 short paragraphs. Target ~80 lines per feature doc, hard cap ~120. Commit messages are 3 lines plus `Co-Authored-By`, not multi-paragraph essays. End-of-session handoff prose is forbidden -- the Progress checklist's NEXT line IS the handoff; trust it. Verbosity in any of these costs every future session that has to read it to orient.
 
 ## Token Hierarchy
 
