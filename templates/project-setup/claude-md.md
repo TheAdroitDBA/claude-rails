@@ -23,7 +23,7 @@ Stop when you have enough context:
 - Project-specific hooks/skills/agents: under `.claude/` (each directory has a README when populated)
 
 ## Framework essentials
-- **Hard rules:** no emojis in .md files (plain text only); prefer editing existing files over creating new ones; hooks are opt-in per repo via `.claude/feature-doc-required`; all operations idempotent.
+- **Hard rules:** no emojis in .md files (plain text only); match file granularity to concern granularity (avoid both sprawl and concern bleed); hooks are opt-in per repo via `.claude/feature-doc-required`; all operations idempotent.
 - **Outside-in design:** for features with a user-facing surface, write the flow doc first, then feature doc + criteria. Feature criteria must map to flow steps; they own the no-breaking-changes contract.
 - **Progress checklist:** every in-progress feature doc has a `### Progress` checklist under `## Status`. Update it at every decision point BEFORE the code. Last entry names what to do NEXT.
 - **Fix-or-record rule:** a bug found mid-feature has three cases: FIX INLINE (small + same file -- just fix it), RECORD (non-blocking + larger -- `/b` mints `BUG-NNNN`, move on, do not expand scope), or PIVOT (blocking + larger -- `/b` mints `BUG-NNNN`, tag parent criterion `[BLOCKED BY BUG-NNNN]`, `chore(pause):` commit, `/n` the blocker fix to push onto the stack).

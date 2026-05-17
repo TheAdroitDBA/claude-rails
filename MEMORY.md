@@ -7,7 +7,7 @@ claude-rails is the portable framework that eliminates token waste, repetitive t
 ## Hard Rules
 
 1. No emojis or graphical characters in .md files (plain text only).
-2. Prefer editing existing files over creating new ones.
+2. Match file granularity to concern granularity. Add to an existing file when the work belongs to that file's responsibility. Create a new file when the work is a genuinely separate concern with its own success criteria, scope, or lifecycle. Avoid both failure modes: splintering one concern across many files (sprawl) and stuffing multiple concerns into one file (concern bleed). When unsure, ask: could a reader find this with one read, and could it be deleted as a unit?
 3. All operations must be idempotent (safe to re-run).
 4. Hooks are opt-in per repo via a marker file (`.claude/feature-doc-required`).
 5. Every feature doc must have a `### Progress` checklist under `## Status`. Update it at every decision point during the session -- not just at the end. A decision point is: starting a step, completing a step, rejecting an approach, or changing a criterion. Write the checklist entry BEFORE the code so intent survives a crash. Add the commit hash after. The last entry should always say what to do NEXT (the session handoff line).
