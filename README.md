@@ -4,7 +4,7 @@
 
 Claude-rails is a portable framework that eliminates three recurring problems when working across multiple projects with Claude Code:
 
-1. **Token waste.** Every fresh session re-reads source code to rediscover context that could have been captured in a doc. On large codebases, thousands of tokens burn before any real work begins.
+1. **Token waste -- especially at cold-start.** Every fresh session burns tokens rediscovering context that could have been captured in a doc. The framework's target: a cold session orients to any opted-in repo in under 15k tokens, measured by `/discovery-check`. Cold-start cost is the load-bearing case -- if a fresh session is cheap, every subsequent session is cheaper.
 2. **Repetitive tasks.** The same setup, orient, and workflow instructions get re-explained every session. Hooks and slash commands should own the repetition.
 3. **Inconsistent project shape.** Jumping between projects that each lay themselves out differently costs tokens just finding where things live. One framework applied everywhere means the same conventions, the same doc patterns, the same skills available in every repo.
 
