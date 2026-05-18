@@ -2,6 +2,10 @@
 
 [One-line description of what this project does.]
 
+<!-- claude-rails:start v0.0.0 sha=00000000 -->
+(rails-managed block placeholder -- populated by /project-setup or /rails-sync)
+<!-- claude-rails:end -->
+
 ## Start here
 
 - **What's in flight:** see the last line of `.claude/current-feature` (the file is a LIFO stack -- lines above the last are paused parent features)

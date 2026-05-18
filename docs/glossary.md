@@ -60,6 +60,16 @@ Canonical vocabulary for the claude-rails framework. Use these terms precisely i
 - **feature scope** = which files a feature doc covers (controlled by `## Scope` globs or directory position)
 - **`## Scope` section** = the literal heading in a feature doc that contains glob patterns
 
+## Versioning & Sync
+
+| Term | Definition |
+|------|-----------|
+| **managed block** | A delimited region in an adopted repo's `CLAUDE.md` and `README.md` that is framework-owned content. Marked by `<!-- claude-rails:start vX.Y.Z sha=<hash> -->` (start) and `<!-- claude-rails:end -->` (end). Outside the markers is repo-owned and never touched by claude-rails commands. The block carries a version stamp and content hash; `/rails-sync` updates it when the framework moves. |
+| **version stamp** | The `vX.Y.Z` substring inside a managed block's start marker. Matches the framework's `VERSION` file at the time the block was last synced. Compared against the current framework `VERSION` by `/w` (read-only drift check) and `/rails-sync` (update flow). |
+| **content hash** | The `sha=<hash>` substring inside a managed block's start marker. First 8 hex chars of SHA-256 over the **normalized** canonical block content (LF line endings, trailing whitespace stripped per line, no trailing newline). Recomputable from `templates/managed-blocks/current.md`; mismatch against a same-version block indicates the user edited inside the fence. Hash check is skipped for older-stamped blocks (the framework only retains the current canonical template). |
+| **rails-sync** | The `/rails-sync` slash command. Audits managed blocks in the current repo, classifies each (clean / tampered / minor-or-patch drift / major drift / future-version), and offers per-file `y / n / d / a` prompts to update. Refuses major-version overwrites without an explicit `--major` flag. Also writes `.claude/rails-version` on success. Read-only until the user explicitly answers `y`. |
+| **rails-version file** | `.claude/rails-version` -- a single-line, LF-terminated file containing the framework version the repo last synced against (e.g. `v0.1.0`). Single responsibility: install fingerprint. Distinct from `.claude/feature-doc-required`, which stays presence-only opt-in with content ignored. Repos that have `feature-doc-required` but no `rails-version` are treated as "opted in at unknown version" -- backward compatible; no forced migration. |
+
 ## Quality
 
 | Term | Definition |

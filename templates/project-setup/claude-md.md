@@ -1,5 +1,9 @@
 # [Project Name] -- Claude Code Instructions
 
+<!-- claude-rails:start v0.0.0 sha=00000000 -->
+(rails-managed block placeholder -- populated by /project-setup or /rails-sync)
+<!-- claude-rails:end -->
+
 ## What this project is
 [One to two sentences. This answers Q1.]
 

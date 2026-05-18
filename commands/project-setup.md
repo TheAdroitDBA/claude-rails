@@ -309,6 +309,10 @@ Only create `memory/` if the project does not already use `.claude/memory/` for 
 
 Default is `warn`, not `block`. Never loosen an existing mode without asking.
 
+**Also write `.claude/rails-version`** (only if missing). Read the framework's `VERSION` file (parent of this skill's `commands/` directory) and write `v<contents>` to `.claude/rails-version` as a single line, LF-terminated. Example: framework `VERSION` reads `0.1.0` -> file contents become `v0.1.0\n`.
+
+`.claude/feature-doc-required` stays presence-only (its content is still ignored). `.claude/rails-version` is a separate, single-responsibility companion -- the repo's install fingerprint. Existing repos with `feature-doc-required` but no `rails-version` are valid -- `/w` and `/rails-sync` handle that "opted in at unknown version" case explicitly.
+
 ### 6c: CLAUDE.md (create or reconcile)
 
 **If missing:** read the framework's `templates/project-setup/claude-md.md` and customize the placeholders before writing:
@@ -401,6 +405,22 @@ Scaffold `.claude/skills/README.md` if missing. Read the framework's `templates/
 ### 6m: docs.export.yml (only if missing)
 
 If the repo has a `repo_url` (check `git remote get-url origin`): read the framework's `templates/project-setup/docs-export.yml`, substitute `[Project Name]` and `[origin URL]`, and write to `docs.export.yml`. Leave `nav:` as a stub.
+
+### 6o: Managed-block emission (CLAUDE.md and README.md)
+
+After 6c (CLAUDE.md) and 6d (README.md) are written or reconciled, emit the rails-managed block into each. The templates carry the block markers as placeholders (`<!-- claude-rails:start vPLACEHOLDER sha=PLACEHOLDER -->` ... `<!-- claude-rails:end -->`); this step fills them in with real values at write time.
+
+For each of `CLAUDE.md` and `README.md`:
+
+1. Find the start marker `<!-- claude-rails:start ` and end marker `<!-- claude-rails:end -->`. If neither is present, skip this file -- the user may have intentionally removed the block, do not re-inject.
+2. Read the framework's `templates/managed-blocks/current.md` -> `CANONICAL_CONTENT` (the inner-block content).
+3. Read the framework's `VERSION` -> `FRAMEWORK_VERSION` (e.g. `0.1.0`).
+4. Normalize `CANONICAL_CONTENT` per criterion 3 of `rails-managed-blocks.feature.md`: LF line endings, strip trailing whitespace per line, no trailing newline. Compute SHA-256, take first 8 hex chars -> `EXPECTED_HASH`.
+5. Replace the start marker line with: `<!-- claude-rails:start v<FRAMEWORK_VERSION> sha=<EXPECTED_HASH> -->`.
+6. Replace the content between the markers with `CANONICAL_CONTENT`.
+7. Leave everything outside the markers byte-for-byte unchanged.
+
+Idempotent: re-running on a repo with the block already in place will replace the block with itself (if it matches the current canonical) or update it (if the framework version has moved since the last `/project-setup`). For non-trivial drift, prefer `/rails-sync` -- it has the per-file y/n/d/a confirmation flow. This step is for fresh scaffold; surface a hint after writing: `managed block written/refreshed in CLAUDE.md and README.md. Run /rails-sync on future version bumps.`
 
 ### 6n: Enforcement instructions (always reconcile)
 
