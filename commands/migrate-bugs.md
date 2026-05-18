@@ -1,54 +1,124 @@
 ---
-description: One-shot conversion of a repo's flat KNOWN-ISSUES.md to the sectioned-by-area shape and generates memory/BUG-INDEX.md. Idempotent -- re-running on a migrated repo no-ops. Run once per repo when adopting the bug-index pattern.
+description: Bring this repo's bug tracker into compliance with claude-rails. Audits the current tracker shape, proposes an explicit migration plan including renames and deletions, asks for confirmation, then executes. Idempotent. Run once per adopting repo.
 ---
 
-Migrate this repo's bug tracker to the sectioned + INDEX format.
+Bring this repo's bug tracker into claude-rails compliance.
 
-INDEX-first; fallback to flat if absent does not apply here -- this skill produces the INDEX.
+Target shape:
+- `memory/BUG-INDEX.md` -- terse one-line-per-bug index with `## Active` and `## Recently Resolved (last 10)`.
+- `memory/KNOWN-ISSUES.md` -- `## Active` sub-grouped by `### <area>` subsections (alpha-sorted), each entry carrying `Repro:`, `Evidence:`, `First place to look:` lines. `## Resolved` stays flat.
 
-1. **Locate the tracker.** Discover from CLAUDE.md; fallback `memory/KNOWN-ISSUES.md`. If the tracker file does not exist, report `no tracker -- nothing to migrate` and stop.
+This skill never executes without confirmation. It works as audit -> propose -> confirm -> execute.
 
-2. **Idempotency check.** Read the tracker. If `## Active` already contains one or more `### <area>` subsections AND `memory/BUG-INDEX.md` exists with both `## Active` and `## Recently Resolved (last 10)` headings, report `already migrated -- no changes` and stop. Re-running on a migrated repo MUST be a no-op.
+## Step 1: Audit current state
 
-3. **Parse Active entries.** Each entry is a single line starting with `- `. Extract:
-   - `BUG-NNNN` if present (search the line for `BUG-\d+`).
-   - `area` slug: prefer an explicit `area: <slug>` field in the entry; else derive from the path-like segment after the description; else `uncategorized`. Normalize: lowercase, slash to dash, no spaces.
-   - description, created date.
+Read these files if they exist; record what was found:
 
-4. **Mint missing IDs.** For entries without `BUG-NNNN`: compute the next available ID using the same algorithm as `/b` step 2 -- `max(existing IDs across tracker + archive + all *.feature.md) + 1`, zero-padded to 4 digits. Assign in document order. IDs are never reused.
+1. `memory/KNOWN-ISSUES.md`:
+   - **Active heading**: `## Active`, `## Current`, `## Open`, or other. Note the exact heading found.
+   - **Active entries**: classify each line that starts with `- ` directly under the active heading:
+     - **real bug**: has `BUG-NNNN` id, or has an `area:` field, or fits `<description> | ... | <date>` shape.
+     - **prose tracking note**: free-form paragraph; no BUG id, no structured fields, no date.
+     - **placeholder**: `- (none yet)` and equivalents.
+   - **Resolved section**: present? heading exact text? entries count?
+   - **Boilerplate sections**: any extra headings like `## How to use`, `## How to Use This File`, `## Format`. Note them; they are usually harmless and preserved.
 
-5. **Rewrite Active by area.** Group parsed entries by area, alpha-sort the areas, then write the Active section as:
-   ```
-   ## Active
+2. `memory/BUG-INDEX.md`:
+   - Exists with both `## Active` and `## Recently Resolved (last 10)` headings? -> already partially compliant.
+   - Missing -> will be created.
 
-   ### <area-1>
+3. `memory/KNOWN-ISSUES-ARCHIVE.md`:
+   - Exists -> never touch it. Note presence in the audit.
 
-   - BUG-NNNN | <description> | <created-date>
-     Repro: <if known from existing entry, else TBD>
-     Evidence: <if known, else TBD>
-     First place to look: <if known, else TBD>
+## Step 2: Idempotency short-circuit
 
-   ### <area-2>
-   ...
-   ```
-   Preserve all existing context. If the legacy entry lacked Repro/Evidence/First-place-to-look detail, write `TBD` as a placeholder so the gap is visible. Do NOT fabricate evidence.
+If ALL of the following hold, report `already compliant -- no changes` and stop:
+- `memory/KNOWN-ISSUES.md` has `## Active` (exact heading) AND at least one `### <area>` subsection under it (or `- (none yet)` placeholder).
+- `memory/KNOWN-ISSUES.md` has `## Resolved` section.
+- `memory/BUG-INDEX.md` exists with both required headings.
 
-6. **Preserve Resolved.** The `## Resolved` section stays flat -- do not subsection it. Copy entries verbatim. If absent, create `## Resolved` with `- (none yet)`.
+Re-running on a compliant repo MUST be a no-op.
 
-7. **Generate memory/BUG-INDEX.md.** Format:
-   ```
-   # Bug Index
+## Step 3: Propose plan
 
-   ## Active
+Print an audit summary followed by a numbered change list. Use this shape:
 
-   - BUG-NNNN | active | <area> | <description> | <created>
+```
+=== Audit ===
+memory/KNOWN-ISSUES.md         found
+  Active heading:              ## Current  (will rename -> ## Active)
+  Active entries:               1 real bug, 2 prose notes, 0 placeholders
+  Resolved section:             missing (will add)
+  Boilerplate:                  "## How to Use This File" (will preserve)
+memory/BUG-INDEX.md             missing (will create)
+memory/KNOWN-ISSUES-ARCHIVE.md  exists (will not touch)
 
-   ## Recently Resolved (last 10)
+=== Proposed changes ===
+1. Rename heading: ## Current -> ## Active
+2. Restructure ## Active to sectioned shape:
+   - BUG-0001 (porky boot) -> ### porky-boot
+3. Move 2 prose entries -- they are not bugs. Options per entry:
+   (a) memory/MEMORY.md topic file
+   (b) new memory/TECH-DEBT.md
+   (c) convert to a bug (mint BUG-NNNN)
+   (d) delete
+4. Add ## Resolved section with `- (none yet)`
+5. Create memory/BUG-INDEX.md with BUG-0001 in ## Active
 
-   - BUG-NNNN | resolved | <area> | <description> | <created> -> <resolved>
-   ```
-   Sort Active by BUG-NNNN ascending. Recently Resolved: most recent 10 from `## Resolved`, sorted by resolved date descending. Older resolved entries stay in `memory/KNOWN-ISSUES.md` (and archive per `/f` step 5).
+=== Items requiring per-entry decision ===
+Prose entry 1: "homelab-recovery-usb.flow.md still hand-authored..."
+Prose entry 2: "MediaVortex not enrolled in flow-doc generation..."
 
-8. **Report.** Print: count of entries migrated, count of IDs newly minted (with the range, e.g. `BUG-0003..BUG-0005`), and a one-line note if any entries got `TBD` placeholders so the user knows where to fill in detail.
+=== Items to delete ===
+(none in this run)
 
-Do NOT auto-invoke another slash command. The user runs `/w` or `/b` themselves after migration.
+Confirm plan? (yes / no / change <number>)
+```
+
+The audit columns align so the user can scan it. The proposed-changes list is numbered so the user can override individual steps. The decisions block lists every per-entry choice; do not assume defaults.
+
+## Step 4: Resolve decisions
+
+For each prose entry, ask the user which destination (a/b/c/d). For (c), mint a `BUG-NNNN` using the same algorithm as `/b` step 3: `max(existing IDs across tracker + archive + all *.feature.md) + 1`, zero-padded.
+
+If the user picks (d) delete: confirm again ("delete <one-line preview>? yes/no") -- destruction requires explicit double-confirm.
+
+## Step 5: Execute
+
+Only after confirmation. Apply changes in order:
+
+1. **Rename headings.** Edit `memory/KNOWN-ISSUES.md` in place. Use `Edit` tool, not rewriting the whole file.
+
+2. **Restructure Active.** For each real bug, place under `### <area>` subsection. Alpha-sort the subsections. Add `Repro:`, `Evidence:`, `First place to look:` lines below each entry; write `TBD` as placeholder if the legacy entry lacked detail. Never fabricate evidence.
+
+3. **Handle prose entries** per the user's per-entry decision from step 4.
+
+4. **Add ## Resolved section** if missing. Use `- (none yet)` for empty.
+
+5. **Create memory/BUG-INDEX.md** with one line per real bug (sorted by BUG-NNNN ascending) and an empty `## Recently Resolved (last 10)`.
+
+6. **Partial-state safety.** If any file write fails mid-execution, report what completed and what is pending. Do not retry automatically; the user resolves manually before re-running.
+
+## Step 6: Verify
+
+Re-run Step 2 (idempotency check). All three conditions must now pass. If any fails, report which and why.
+
+## Step 7: Report
+
+Print: count of bugs migrated, count of IDs newly minted (with range, e.g. `BUG-0003..BUG-0005`), count of prose entries relocated (with destinations), count of items deleted, count of `TBD` placeholders requiring user follow-up.
+
+## Empty-tracker scaffold
+
+If `memory/KNOWN-ISSUES.md` does NOT exist at all:
+- Offer to scaffold the empty pair (same shape as `/project-setup` step 6h).
+- Confirm with user before creating; some repos intentionally have no tracker.
+- If confirmed, write both files with the empty skeleton (`## Active` and `## Resolved` with `- (none yet)`; `## Active` and `## Recently Resolved (last 10)` for INDEX).
+
+## Notes
+
+- Never `rm` the tracker file. Edits are in-place.
+- Archive file is never touched.
+- Re-running is always safe (Step 2 short-circuits compliant repos).
+- The skill is read-mostly until Step 5. The user can cancel at any prompt without partial damage.
+
+Do NOT auto-invoke another slash command. The user runs `/w` or `/b` themselves after migration completes.

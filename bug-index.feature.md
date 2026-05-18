@@ -25,7 +25,7 @@ Adds `memory/BUG-INDEX.md` (terse one-line-per-bug index) alongside a sectioned 
 7. `/bs BUG-NNNN` moves entry across both files; trims INDEX `## Recently Resolved` to 10 by archiving the oldest.
 8. `/f` and `/fs` hygiene operate on INDEX. Same three flag rules (age 30d, missing criterion, criterion shipped).
 9. `/w` bug surface from INDEX as `<area> (N open)`. No KNOWN-ISSUES.md read.
-10. `/migrate-bugs` detects flat format, rewrites Active by area, generates INDEX. Idempotent: re-run on migrated repo no-ops.
+10. ~~`/migrate-bugs` detects flat format, rewrites Active by area, generates INDEX. Idempotent: re-run on migrated repo no-ops.~~ -> `/migrate-bugs` is an interactive compliance skill: audits current shape (handles heading aliases like `## Current`, distinguishes real bugs from prose tracking notes), proposes a numbered plan including renames/deletions/per-entry destinations, executes only on confirmation. Idempotent: compliant repos no-op at audit step. Empty-tracker repos offered scaffold. Reason: real adopting repos use varied shapes; the original "detect flat, rewrite" spec served zero of the four audited repos. (Progress 2026-05-18)
 11. Repos without INDEX continue via fallback. `/project-setup` creates empty INDEX (two headings, no entries) for new repos.
 12. `docs/glossary.md` adds `BUG-INDEX file`, `area subsection`; updates `KNOWN-ISSUES.md` and `Bug ID` entries.
 13. Each affected command file opens with a one-line "INDEX-first; fallback to flat if absent" note.
@@ -49,6 +49,7 @@ COMPLETE
 - [x] Phase 9 (2026-05-17): updated docs/glossary.md -- added BUG-INDEX file, area subsection, KNOWN-ISSUES.md entries; updated Bug ID to reference both surfaces. Criterion 12.
 - [x] Phase 10 (2026-05-17): updated MEMORY.md (reconciled from CLAUDE.md per Hard Rule 6) -- added "Capture ideas before context shifts" to Development Principles. Criterion 14.
 - [x] Phase 11 (2026-05-17): self-host smoke -- all 7 affected commands carry the INDEX-first note; BUG-INDEX + KNOWN-ISSUES agree on BUG-0001; INDEX has required two headings; KNOWN-ISSUES has `### project-setup` subsection; /migrate-bugs idempotency holds.
+- [x] Phase 11b (2026-05-18): cross-repo audit revealed input-shape gap -- adopting repos use `## Current` not `## Active` and mix prose-tracking-notes with real bugs. Rewrote commands/migrate-bugs.md as interactive audit-propose-confirm-execute compliance skill (same pattern as /project-setup). Handles heading aliases, prose-entry detection, per-entry destination decisions, double-confirm on deletions, empty-tracker scaffold path.
 - [ ] Phase 12 (out of session scope): deploy to user's other adopting repos -- requires running /migrate-bugs in each repo on next visit.
 - [ ] NEXT: on next visit to each adopting repo, run `/migrate-bugs` once. Then pick up `features-index` from IDEAS.md as the next feature.
 
