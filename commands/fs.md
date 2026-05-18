@@ -2,6 +2,8 @@
 description: Feature success -- full completion pipeline. Runs finalize, QA, UX review (if surface declared), dead code cleanup, doc updates, deviation summary, simplify pass, and commit.
 ---
 
+INDEX-first; fallback to flat if absent (inherited from /f hygiene step).
+
 Feature success -- run the full completion pipeline in order. Do not skip steps.
 
 1. Run /f (finalize checklist): turn off debug, update ### Progress with commit hashes, mark feature COMPLETE.

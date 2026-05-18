@@ -1,0 +1,3 @@
+# Ideas
+
+- 2026-05-17 | features-index: mirror bug-index pattern for feature docs. /n and /fs maintain features/INDEX.md with one-line entries (slug, status, surface flag, last-touched, path). New /f repurposed as lightweight resume (reads INDEX + top-of-stack only); old /f finalize work absorbed into /fs. /w refactored to read indexes only, never full docs. Naming becomes symmetric: /n open, /f resume, /fs close (mirrors /b, /t, /bs). Solves 16k+ token cold-start when starting next feature. Do AFTER bug-index ships (validates the pattern first). Also: add a CLAUDE.md principle "future-work discussions get captured via /i before context shifts" -- same shape as "Learn from failures" but for ideas not corrections.

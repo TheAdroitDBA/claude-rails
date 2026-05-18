@@ -2,6 +2,8 @@
 description: Finalize current work. Turns off debug logging, updates the feature doc progress checklist, marks the feature COMPLETE, and reports git status.
 ---
 
+INDEX-first; fallback to flat if absent.
+
 Finalize the current feature. Work through these steps in order:
 
 1. Turn off any debug logging, verbose flags, or temporary instrumentation added during development.
@@ -10,16 +12,24 @@ Finalize the current feature. Work through these steps in order:
 
 3. Mark the feature doc ## Status as COMPLETE.
 
-4. Move resolved bugs from **Active** to **Resolved** in the issues tracker (memory/KNOWN-ISSUES.md or the declared tracker). Append ` | resolved: <today's date>` to each entry. The `BUG-NNNN` id stays on the entry forever. Only move entries that are verifiably fixed by this work. Do NOT delete entries.
+4. **Move resolved bugs (INDEX present path).** For each bug verifiably fixed by this work:
+   - `memory/KNOWN-ISSUES.md`: cut from its `### <area>` subsection in `## Active`, paste into `## Resolved` with ` | resolved: <today's date>`.
+   - `memory/BUG-INDEX.md`: move the line from `## Active` to `## Recently Resolved (last 10)`, change `active` to `resolved`, append ` -> <today's date>`.
 
-5. If the **Resolved** section has more than 10 entries, move the oldest resolved entries to `memory/KNOWN-ISSUES-ARCHIVE.md` (create the archive file if it does not exist).
+   The `BUG-NNNN` id stays on the entry forever. Do NOT delete entries.
 
-6. Quick tracker hygiene (while the tracker is open): scan **Active** entries. Flag any that are:
+   **Fallback (INDEX absent):** move from flat `## Active` to flat `## Resolved` with the same date suffix.
+
+5. **Archive overflow.** If `memory/BUG-INDEX.md` `## Recently Resolved` exceeds 10 entries, drop the oldest from INDEX (the full entry remains in KNOWN-ISSUES.md). If `memory/KNOWN-ISSUES.md` `## Resolved` exceeds 10 entries, move the oldest to `memory/KNOWN-ISSUES-ARCHIVE.md` (create the archive file if it does not exist).
+
+6. **Hygiene scan on INDEX (INDEX present path).** Read `memory/BUG-INDEX.md` `## Active`. Flag any entry that is:
    - older than 30 days,
-   - whose linked `[BUG-NNNN]` criterion no longer exists in the feature doc, or
+   - whose linked `[BUG-NNNN]` criterion no longer exists in any feature doc, or
    - whose linked criterion's `### Progress` line is checked off (`[x]`) in the feature doc -- the fix shipped but the tracker was never updated. Recommend `/bs` on the entry.
 
-   Report findings inline -- do not block finalization.
+   Report findings inline -- do not block finalization. Do NOT read full KNOWN-ISSUES.md to do this scan; INDEX has every active ID.
+
+   **Fallback (INDEX absent):** same flag rules against flat tracker `## Active`.
 
 7. Run git status and report the current state of the working tree.
 

@@ -3,11 +3,19 @@ description: Troubleshoot and fix a bug. Doc-first: ensures feature and flow doc
 argument-hint: <bug-description-or-BUG-NNNN>
 ---
 
+INDEX-first; fallback to flat if absent.
+
 Troubleshoot: $ARGUMENTS
 
 Follow doc-first order. Do not read source code until step 5.
 
-1. Read the project's issues tracker (discovered from CLAUDE.md; fallback memory/KNOWN-ISSUES.md). If `$ARGUMENTS` matches the pattern `BUG-\d{4}`, grep the tracker (and archive) for that exact ID and resolve to the matching entry directly -- no fuzzy matching. Otherwise, match by description. If no entry exists, run /b first to record it (which assigns a `BUG-NNNN`), then resume here.
+1. **Resolve the bug via INDEX.** Read `memory/BUG-INDEX.md` if it exists. If `$ARGUMENTS` matches `BUG-\d{4}`, look up the exact ID in the INDEX and extract its `<area>`. Otherwise, match by description against the INDEX `## Active` entries.
+
+   Then read ONLY the matched `### <area>` subsection of `memory/KNOWN-ISSUES.md` -- do not read the whole file. The subsection contains Repro/Evidence/First-place-to-look for this bug.
+
+   **Fallback (INDEX absent):** read the project's flat issues tracker (discovered from CLAUDE.md; fallback `memory/KNOWN-ISSUES.md`). If `$ARGUMENTS` matches `BUG-\d{4}`, grep the tracker (and archive) for that exact ID. Otherwise, match by description.
+
+   If no entry exists (INDEX or flat), run `/b` first to record it (which assigns a `BUG-NNNN`), then resume here.
 
 2. Read the feature doc for the affected feature. If no criterion matches this bug, add a `[BUG-NNNN]` criterion before proceeding -- the fix is not verifiable without one.
 

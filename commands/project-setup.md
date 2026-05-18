@@ -354,7 +354,17 @@ Read the canonical feature doc template from the framework's `templates/project-
 
 If the repo already has a tracker at a non-standard path, do NOT create a parallel `memory/KNOWN-ISSUES.md`. Instead, close Q3 by pointing at the existing file from CLAUDE.md and README.
 
-If there is no tracker at all: read the framework's `templates/project-setup/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is.
+If there is no tracker at all: read the framework's `templates/project-setup/known-issues.md` and write to `memory/KNOWN-ISSUES.md` as-is. ALSO create an empty `memory/BUG-INDEX.md` with the two-heading shape (no entries):
+
+```
+# Bug Index
+
+## Active
+
+## Recently Resolved (last 10)
+```
+
+This pairs the sectioned tracker with its INDEX from day one. If the repo already has `memory/KNOWN-ISSUES.md` in flat shape (no `### <area>` subsections in `## Active`), recommend running `/migrate-bugs` to convert it -- do NOT auto-convert during `/project-setup`.
 
 ### 6i: Rules templates (in .claude/rules/, only if approved)
 
