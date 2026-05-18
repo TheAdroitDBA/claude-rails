@@ -130,6 +130,26 @@ The ADF converter handles:
 - Complex HTML
 - Mermaid diagrams (render as images first)
 
+## Links: friendly names, no raw URLs
+
+Every URL in an uploaded page must use markdown link syntax with a descriptive name:
+
+- Bad: `https://niceincontact.service-now.com/sp?id=sc_cat_item&sys_id=b234...`
+- Good: `[DBA-Operations General Request](https://niceincontact.service-now.com/sp?id=sc_cat_item&sys_id=b234...)`
+
+The markdown `[Friendly Name](URL)` converts to a Confluence `<a href="...">Friendly Name</a>` element. Raw URLs render as wall-of-character text in the page body and break scannability.
+
+### Rules
+- The link text must describe what the link points to. Avoid "click here," "this link," "see here." If the target is a ServiceNow catalog item, the link text is the catalog item name. If it's another Confluence page, the link text is the page title.
+- Never paste a bare URL inline. If the URL is the only thing you have, wrap it: `[Open in browser](URL)`.
+- For internal Confluence-to-Confluence references, use the page title as the link text so future renames are findable in search.
+
+### Open in new page
+
+External URLs (ServiceNow, GitHub, other tools) open in a new browser tab by default in Confluence Cloud when the destination is outside the Confluence domain. Markdown link syntax produces the correct storage format for this behavior -- no extra attributes are needed in the markdown.
+
+For internal Confluence-to-Confluence links the default is same-tab. If a workflow requires a Confluence page to open in a new tab, document the requirement in the feature/runbook itself and edit the link in the Confluence UI after upload (the uploader does not emit `target="_blank"` from markdown).
+
 ## File Title Extraction
 
 The uploader extracts page title from the **first line** of the markdown file:
