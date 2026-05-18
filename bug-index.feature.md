@@ -50,8 +50,8 @@ COMPLETE
 - [x] Phase 10 (2026-05-17): updated MEMORY.md (reconciled from CLAUDE.md per Hard Rule 6) -- added "Capture ideas before context shifts" to Development Principles. Criterion 14.
 - [x] Phase 11 (2026-05-17): self-host smoke -- all 7 affected commands carry the INDEX-first note; BUG-INDEX + KNOWN-ISSUES agree on BUG-0001; INDEX has required two headings; KNOWN-ISSUES has `### project-setup` subsection; /migrate-bugs idempotency holds.
 - [x] Phase 11b (2026-05-18): cross-repo audit revealed input-shape gap -- adopting repos use `## Current` not `## Active` and mix prose-tracking-notes with real bugs. Rewrote commands/migrate-bugs.md as interactive audit-propose-confirm-execute compliance skill (same pattern as /project-setup). Handles heading aliases, prose-entry detection, per-entry destination decisions, double-confirm on deletions, empty-tracker scaffold path.
-- [ ] Phase 12 (out of session scope): deploy to user's other adopting repos -- requires running /migrate-bugs in each repo on next visit.
-- [ ] NEXT: on next visit to each adopting repo, run `/migrate-bugs` once. Then pick up `features-index` from IDEAS.md as the next feature.
+- [x] Phase 12 (2026-05-18): deployment reframed. claude-rails ships the skill; per-repo compliance is each repo owner's responsibility. Running `/migrate-bugs` in any adopting repo brings it to spec. Phase 12 closes here because the framework's job ends at shipping a working skill.
+- [ ] NEXT: nothing on bug-index. Next feature: `features-index` from IDEAS.md. Stack now resumes `rails-managed-blocks` (paused at Phase 1).
 
 ## Interrupts: rails-managed-blocks
 
