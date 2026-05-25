@@ -22,6 +22,21 @@ Report what is open and what needs attention:
 
    If `.claude/current-feature` does not exist or is empty, print `no active feature (stack empty)` and continue.
 
+   **Sibling worktrees.** Run `git worktree list --porcelain` to enumerate worktrees of this repo. Skip this sub-step entirely if only one worktree exists. Otherwise, for each worktree whose path is not the current working directory:
+   - Read `<worktree-path>/.claude/current-feature`. If missing or empty, skip silently.
+   - Print a separator line `[worktree: <path> on <branch>]` followed by each stack frame as slug-only (indented by depth, last frame marked `[active here]`).
+   - Do NOT read sibling feature docs for `## Status` or NEXT lines. Slugs only -- keep cross-worktree read cheap. Full detail requires `cd`-ing into that worktree and re-running `/w`.
+
+   Example output with a migration pinned in a sibling worktree:
+
+   ```
+   bug-fix-x              IN PROGRESS  [active]
+     -> next: add regression test
+
+   [worktree: C:\Code\claude-rails-migration on migration/v2]
+   schema-migration-v2    [active here]
+   ```
+
 2. **Managed-block drift check (read-only).** Locate the framework root (parent of the `commands/` folder this skill lives in). Read `<framework-root>/VERSION` -> `FRAMEWORK_VERSION`. Read `.claude/rails-version` in the current repo if it exists -> `REPO_VERSION`.
 
    Cases:
