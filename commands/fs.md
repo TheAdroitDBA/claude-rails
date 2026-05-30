@@ -8,7 +8,16 @@ Feature success -- run the full completion pipeline in order. Do not skip steps.
 
 1. Run /f (finalize checklist): turn off debug, update ### Progress with commit hashes, mark feature COMPLETE.
 
-2. QA: spawn the qa-tester agent against the feature's success criteria. Record any failures as `[BUG-NNNN]` criteria before closing (use `/b` to assign each ID).
+2. QA: walk each Success Criterion and gather evidence. Pick the cheapest path that still produces a defensible record.
+
+   - **DEFAULT (inline, ~5k tokens):** verify yourself. For criteria that resolve via grep / file inspection / curl / git log / unit-test output, do the check in-session and cite the line numbers, HTTP codes, or test names per criterion. The main-session already has the codebase context; spawning a fresh agent throws that away and re-reads the same files.
+   - **SPAWN qa-tester agent (~50-80k tokens) ONLY when** at least one criterion requires:
+     (a) behavioral / "user-visible" reasoning that benefits from a fresh, opinion-uncontaminated read, OR
+     (b) probes across multiple hosts the main session hasn't already touched, OR
+     (c) high-stakes independent verification of facts the main session itself authored (e.g., production cutover, security-relevant change).
+   - In either path: do NOT mark any criterion as PASS -- that is the user's call per `.claude/rules/feature-criteria.md`. Record per-criterion status as IMPLEMENTED (with evidence), NOT STARTED, or UNVERIFIABLE (with reason).
+   - Failures get recorded as `[BUG-NNNN]` criteria before closing (use `/b` to assign each ID).
+   - State which path you took ("inline QA" or "qa-tester agent") in the closure output so the cost decision is auditable.
 
 3. UX review (conditional): if the feature doc has a ## Surface section declaring user-facing touchpoints (CLI, UI, API humans call, error messages, docs), spawn the ux-reviewer agent with the feature doc path. Skip if no ## Surface section or it reads "none" or "internal".
 
