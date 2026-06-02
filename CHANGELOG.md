@@ -19,6 +19,19 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ### Changed
 
+- `commands/bs.md` — close-out now archives resolved entries directly to
+  `memory/KNOWN-ISSUES-ARCHIVE.md` instead of staging them in
+  `memory/KNOWN-ISSUES.md` `## Resolved`. Rationale: every full read of
+  KNOWN-ISSUES.md was paying token cost for closed-bug prose with no
+  operational value -- the BUG-INDEX `## Recently Resolved (last 10)`
+  line is the operational quick-reference; the prose belongs in archive
+  from day one. Removes the prior step 4 archive-on-overflow logic
+  (`## Resolved` no longer accumulates, so the overflow trigger is
+  obsolete). Fallback path (INDEX absent) updated to match. **MINOR**
+  (behavior change in resolved-entry placement; INDEX and Active flow
+  unchanged; existing repos with content in `## Resolved` should be
+  swept once to archive -- one-shot, idempotent on re-run).
+
 - `commands/f.md` and `commands/w.md` — tracker hygiene scan now also
   flags Active KNOWN-ISSUES entries whose linked criterion's `### Progress`
   line is checked off (`[x]`). Catches the "fix shipped but tracker
