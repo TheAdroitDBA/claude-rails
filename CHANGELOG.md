@@ -10,6 +10,16 @@ While in `0.x`, breaking changes may land on a MINOR bump and will be marked **B
 
 ### Added
 
+- `conventions/auto-doc.md` — Generator Contract section under "The
+  Generator + Audit Pattern". Pins module-scope identity constants
+  (`AUDIT_NAME`, `MARKER_PREFIX`, optional `TEST_PATH` and
+  `REQUIRES_NETWORK`), uniform CLI shape (`--audit`, `--dry-run`,
+  default-write) with exit-code semantics, metric emission contract
+  (`docs_audit_last_run_timestamp_seconds`, `docs_audit_runs_total`),
+  synthetic-failure test floor, and filesystem-based registry
+  discovery requirement. Adopter repos use this to enforce that adding
+  a new generator is a one-file change. **MINOR** (additive; existing
+  generators that don't conform are warnings, not errors, until 1.0.0).
 - `conventions/flow-source.schema.json` — JSON Schema (`schema_version = 1`)
   for `*.flow.toml` files. Defines structured source of truth for flow
   documents: `entry_point`, ordered `steps[]` (id, name, where, detail,

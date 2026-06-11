@@ -192,6 +192,112 @@ its own generators for its own systems.
 One generator can emit into multiple files; one file can contain
 output from multiple generators (different marker labels).
 
+### Generator Contract
+
+The pattern above defines what a generator does. The contract below
+pins HOW it does it, so that downstream consumers (pre-commit gates,
+build loops, dashboards, alert pipelines) can discover, run, and verify
+every generator without per-generator special cases.
+
+A generator that violates any of the four parts below is a defect, not
+a deliverable.
+
+**1. Module-scope identity**
+
+Every generator declares its identity via two module-level constants:
+
+```python
+AUDIT_NAME = "fstab_audit"     # unique per generator within a repo
+MARKER_PREFIX = "fstab"        # None for non-marker generators
+```
+
+`AUDIT_NAME` is the label value used in every emitted metric and the
+suffix of the textfile-collector filename. `MARKER_PREFIX` is the name
+between `generated:` and `:start/:end` in the marker block this
+generator owns. Generators that don't write to a marker block (DNS
+push, config file generation, pure audits) declare
+`MARKER_PREFIX = None`.
+
+Both constants must be unique across the repo's generator set. Two
+generators declaring the same `AUDIT_NAME` is a defect; same for
+`MARKER_PREFIX` (when non-None).
+
+Optional module-scope constants:
+
+```python
+TEST_PATH = "tests/test_live_state_fstab.py"   # override default
+REQUIRES_NETWORK = False                       # default True
+```
+
+`TEST_PATH` overrides the default `tests/test_<AUDIT_NAME>.py` lookup.
+`REQUIRES_NETWORK` lets the pre-commit gate filter out generators that
+need SSH/HTTP credentials — the file-only subset runs in the gate; the
+full set runs in the publish loop.
+
+**2. Uniform CLI**
+
+Every generator supports three modes:
+
+```
+generator.py             # write + exit 0 on success
+generator.py --dry-run   # print proposed output to stdout; no writes
+generator.py --audit     # compare current vs proposed; exit 1 on drift
+```
+
+Exit codes:
+
+- `0` — clean (nothing to do, or wrote successfully)
+- `1` — drift (audit mode found a difference)
+- `2+` — error (could not run; e.g. unreachable source, parse failure)
+
+A generator that returns `0` on drift in `--audit` mode is a defect.
+
+**3. Metric emission**
+
+Every generator emits two Prometheus metrics to
+`/var/lib/node_exporter/textfile/docs_audit_<AUDIT_NAME>.prom` (or the
+path provided via `--metrics-dir` for tests):
+
+```
+# HELP docs_audit_last_run_timestamp_seconds Unix time of last run.
+# TYPE docs_audit_last_run_timestamp_seconds gauge
+docs_audit_last_run_timestamp_seconds{audit="<AUDIT_NAME>"} <epoch>
+
+# HELP docs_audit_runs_total Run counter labeled by result.
+# TYPE docs_audit_runs_total counter
+docs_audit_runs_total{audit="<AUDIT_NAME>",result="pass|fail"} 1
+```
+
+If the textfile-collector directory does not exist on the host (e.g.
+running on a workstation), the generator silently skips metric
+emission. This is correct — the gate still works, just without
+telemetry.
+
+**4. Synthetic-failure test floor**
+
+Every generator has at least one test file (default path:
+`tests/test_<AUDIT_NAME>.py`, overridable by `TEST_PATH`) containing
+at least one test method whose name includes `synthetic` or `drift`.
+The test injects a known-bad input and asserts `--audit` returns
+non-zero with the expected finding string. This catches "audit
+silently regressed to always-pass" — the failure mode that renders the
+contract inert.
+
+**Registry discovery**
+
+A repo's generator set is filesystem-discovered, not hand-curated. The
+discovery globs are declared in the repo's `auto_doc_registry` module.
+Adding a generator means dropping a file matching the glob; no edits
+to gate scripts, build loops, this convention, or any registry list.
+Removing a generator means deleting the file; the discovery walk picks
+up the deletion automatically.
+
+Downstream consumers (gates, loops, dashboards) MUST depend on the
+registry's typed output, not on a hardcoded list of generator names.
+A hardcoded list is a defect — it makes the OCP property
+(open-for-extension, closed-for-modification) of the contract
+unenforceable.
+
 ## Doc-Type Shapes
 
 ### Feature docs (`*.feature.md`)
